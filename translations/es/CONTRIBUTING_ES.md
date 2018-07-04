@@ -86,8 +86,7 @@ Gatsby utiliza <tt>Redux</tt> para administrar el estado durante el desarrollo y
 útil para ver el flujo de acciones y el estado acumulado de un sitio en el que se está trabajando
 o si agrega una nueva funcionalidad al núcleo. Aprovechamos
 https://github.com/zalmoxisus/remote-redux-devtools y
-https://github.com/zalmoxisus/remotedev-server para darle el uso a _Redux
-devtools extension_ para depurar Gatsby.
+https://github.com/zalmoxisus/remotedev-server para ayudarte depurar Gatsby.
 
 Para usar esto, primero instale
 [redux-devtools-extension](https://github.com/zalmoxisus/redux-devtools-extension)
