@@ -31,22 +31,6 @@ plugins: [
 ]
 ```
 
-If you need to override the default options passed into [`css-loader`](https://github.com/webpack-contrib/css-loader)
-
-```javascript
-// in gatsby-config.js
-plugins: [
-  {
-    resolve: `gatsby-plugin-less`,
-    options: {
-      cssLoaderOptions: {
-        camelCase: false,
-      },
-    },
-  },
-]
-```
-
 ### With CSS Modules
 
 Using CSS modules requires no additional configuration. Simply prepend `.module` to the extension. For example: `App.less` -> `App.module.less`.

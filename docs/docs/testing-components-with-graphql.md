@@ -30,48 +30,45 @@ done.
 As this is testing a page component you will need to put your tests in another
 folder so that Gatsby doesn't try to turn the tests into pages.
 
-```js:title=src/pages/__tests__/index.js
+```js
+// src/__tests__/index.js
+
 import React from "react"
 import renderer from "react-test-renderer"
-import Index from "../index"
+import BlogIndex from "../pages/index"
 
-describe("Index", () =>
-  it("renders correctly", () => {
-    const tree = renderer.create(<Index />).toJSON()
-    expect(tree).toMatchSnapshot()
-  }))
-```
-
-If you run this test you will get an error, as the StaticQuery in the `Layout` component is not mocked. You can fix this by mocking it, like so:
-
-```js:title=src/__tests__/index.js
-import React from "react"
-import renderer from "react-test-renderer"
-import { StaticQuery } from "gatsby"
-import Index from "../pages/index"
-
-beforeEach(() => {
-  StaticQuery.mockImplementationOnce(({ render }) =>
-    render({
-      site: {
-        siteMetadata: {
-          title: `Default Starter`,
-        },
-      },
-    })
-  )
-})
-
-describe("Index", () =>
+describe("BlogIndex", () =>
   it("renders correctly", () => {
     const tree = renderer.create(<BlogIndex />).toJSON()
     expect(tree).toMatchSnapshot()
   }))
 ```
 
-This should fix the `StaticQuery` error, but in a more real-world example you may also be using a page query with the `graphql` helper from Gatsby. In this case, there is no GraphQL data being passed to the component. We can pass this in too,
+If you run this test you will get an error, as the component is expecting a
+location object. You can fix this by passing one in:
+
+```js
+// src/__tests__/index.js
+
+import React from "react"
+import renderer from "react-test-renderer"
+import BlogIndex from "../pages/index"
+
+describe("BlogIndex", () =>
+  it("renders correctly", () => {
+    const location = {
+      pathname: "",
+    }
+
+    const tree = renderer.create(<BlogIndex location={location} />).toJSON()
+    expect(tree).toMatchSnapshot()
+  }))
+```
+
+This should fix the `location` error, but now you will have an error because
+there is no GraphQL data being passed to the component. We can pass this in too,
 but the structure is a little more complicated. Luckily there's an easy way to
-get some suitable data. Run `npm run develop` and go to
+get some suitable data. Run `gatsby develop` and go to
 http://localhost:8000/___graphql to load the GraphiQL IDE. You can now get the
 right data using the same query that you used on the page. If it is a simple
 query with no fragments you can copy it directly. That is the case here, run
@@ -81,7 +78,21 @@ this query copied from the index page:
 query IndexQuery {
   site {
     siteMetadata {
-      author
+      title
+    }
+  }
+  allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    edges {
+      node {
+        excerpt
+        fields {
+          slug
+        }
+        frontmatter {
+          date(formatString: "DD MMMM, YYYY")
+          title
+        }
+      }
     }
   }
 }
@@ -95,8 +106,24 @@ Here it is, trimmed to one node for brevity:
   "data": {
     "site": {
       "siteMetadata": {
-        "author": "Your Name Here"
+        "title": "Gatsby Starter Blog"
       }
+    },
+    "allMarkdownRemark": {
+      "edges": [
+        {
+          "node": {
+            "excerpt": "Far far away, behind the word mountains, far from the countries Vokalia and\nConsonantia, there live the blind texts. Separated they live in…",
+            "fields": {
+              "slug": "/hi-folks/"
+            },
+            "frontmatter": {
+              "date": "28 May, 2015",
+              "title": "New Beginnings"
+            }
+          }
+        }
+      ]
     }
   }
 }
@@ -138,37 +165,49 @@ When you have the result, copy the `data` value from the output panel. Good
 practice is to store your fixtures in a separate file, but for simplicity here
 you will be defining it directly inside your test file:
 
-```js:title=src/pages/__tests__/index.js
+```js
+// src/__tests__/index.js
+
 import React from "react"
 import renderer from "react-test-renderer"
-import Index from "../index"
+import BlogIndex from "../pages/index"
 
-beforeEach(() => {
-  StaticQuery.mockImplementationOnce(({ render }) =>
-    render({
-      site: {
-        siteMetadata: {
-          title: `Default Starter`,
-        },
-      },
-    })
-  )
-})
-
-describe("Index", () => {
+describe("BlogIndex", () =>
   it("renders correctly", () => {
+    const location = {
+      pathname: "",
+    }
+
     const data = {
       site: {
         siteMetadata: {
-          author: "Your name",
+          title: "Gatsby Starter Blog",
         },
+      },
+      allMarkdownRemark: {
+        edges: [
+          {
+            node: {
+              excerpt:
+                "Far far away, behind the word mountains, far from the countries Vokalia and\nConsonantia, there live the blind texts. Separated they live in…",
+              fields: {
+                slug: "/hi-folks/",
+              },
+              frontmatter: {
+                date: "28 May, 2015",
+                title: "New Beginnings",
+              },
+            },
+          },
+        ],
       },
     }
 
-    const tree = renderer.create(<Index data={data} />).toJSON()
+    const tree = renderer
+      .create(<BlogIndex location={location} data={data} />)
+      .toJSON()
     expect(tree).toMatchSnapshot()
-  })
-})
+  }))
 ```
 
 Run the tests and they should now pass. Take a look in `__snapshots__` to see
@@ -179,7 +218,9 @@ the output.
 The method above works for page queries, as you can pass the data in directly to
 the component. This doesn't work for components that use `StaticQuery` though,
 as that uses `context` rather than `props` so we need to take a slightly
-different approach to testing these types of components.
+different approach to testing these. The blog starter project doesn't include
+`StaticQuery`, so the example here is from
+[the StaticQuery docs](/docs/static-query/).
 
 Using `StaticQuery` allows you to make queries in any component, not just pages.
 This gives a lot of flexibility, and avoid having to pass the props down to
@@ -192,7 +233,8 @@ test.
 Here is the example of a header component that queries the page data itself,
 rather than needing it to be passed from the layout:
 
-```jsx:title=src/components/header.js
+```js
+// src/components/Header.js
 import React from "react"
 import { StaticQuery } from "gatsby"
 
@@ -221,7 +263,8 @@ export default props => (
 This is almost ready: all you need to do is export the pure component that you
 are passing to StaticQuery. Rename it first to avoid confusion:
 
-```jsx:title=src/components/header.js
+```js
+// src/components/Header.js
 import React from "react"
 import { StaticQuery, graphql } from "gatsby"
 
@@ -257,21 +300,22 @@ GraphQL.
 This is a good example of the benefits of keeping components "pure", meaning
 they always generate the same output if given the same inputs and have no
 side-effects apart from their return value. This means we can be sure the tests
-are always reproducible and don't fail if, for example, the network is down or
+are always reproducable and don't fail if, for example, the network is down or
 the data source changes. In this example, `Header` is impure as it makes a
 query, so the output depends on something apart from its props. `PureHeader` is
-pure because its return value is entirely dependent on the props passed to it.
+pure because its return value is entirely dependent on the props passed it it.
 This means it's very easy to test, and a snapshot should never change.
 
 Here's how:
 
-```js:title=src/components/__tests__/header.js
+```js
+// src/components/Header.test.js
+
 import React from "react"
 import renderer from "react-test-renderer"
+import { PureHeader as Header } from "./Header"
 
-import { PureHeader as Header } from "../header"
-
-describe("Header", () => {
+describe("Header", () =>
   it("renders correctly", () => {
     // Created using the query from Header.js
     const data = {
@@ -283,8 +327,7 @@ describe("Header", () => {
     }
     const tree = renderer.create(<Header data={data} />).toJSON()
     expect(tree).toMatchSnapshot()
-  })
-})
+  }))
 ```
 
 ## Using TypeScript

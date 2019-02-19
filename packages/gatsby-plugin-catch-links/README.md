@@ -1,19 +1,20 @@
 # gatsby-plugin-catch-links
 
-This plugin intercepts all local links that have not been created in React using [`gatsby-link`](https://gatsbyjs.org/docs/gatsby-link), and replaces their behaviour with that of the `gatsby-link` [`navigate`](https://gatsbyjs.org/docs/gatsby-link/#programmatic-navigation). This avoids the browser having to refresh the whole page when navigating between local pages, preserving the Single Page Application (SPA) feel.
+Intercepts local links from markdown and other non-react pages and does a
+client-side pushState to avoid the browser having to refresh the page.
 
-Example use cases:
+For instance, in a markdown file with relative links (transformed
+to `a` tags by
+[`gatsby-transformer-remark`](/packages/gatsby-transformer-remark/)), this
+plugin replaces the default link behaviour
+with that of [`gatsby-link`'s `navigate`](https://gatsbyjs.org/docs/gatsby-link/#programmatic-navigation), preserving the
+SPA-like page change without reload.
 
-- A markdown file with relative links (transformed
-  to `a` tags by
-  [`gatsby-transformer-remark`](/packages/gatsby-transformer-remark/))
-- An `a` tag that has been created by a Content Management System (CMS) WYSIWYG editor
+Check out the [_Using Remark_ example](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-remark) to see this plugin in action.
 
-## Installation
+## Install
 
-```
-npm install --save gatsby-plugin-catch-links
-```
+`npm install --save gatsby-plugin-catch-links`
 
 ## How to use
 
@@ -21,7 +22,3 @@ npm install --save gatsby-plugin-catch-links
 // In your gatsby-config.js
 plugins: [`gatsby-plugin-catch-links`]
 ```
-
-## Examples
-
-- Check out this live example [_Using Remark_](https://using-remark.gatsbyjs.org/copy-linked-files-intercepting-local-links/#intercepting-local-links) to see this plugin in action. The full source code for this example can be found here [here](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-remark).

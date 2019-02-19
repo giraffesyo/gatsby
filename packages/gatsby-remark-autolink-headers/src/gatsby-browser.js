@@ -1,30 +1,35 @@
+import { globalHistory as history } from "@reach/router/lib/history"
+
+let currentPathName
 let offsetY = 0
 
-const getTargetOffset = hash => {
-  const id = window.decodeURI(hash.replace(`#`, ``))
-  if (id !== ``) {
-    const element = document.getElementById(id)
-    if (element) {
-      return element.offsetTop - offsetY
+const scrollToHash = () => {
+  // Make sure React has had a chance to flush to DOM first and apply styles.
+  setTimeout(() => {
+    const hash = window.decodeURI(window.location.hash.replace(`#`, ``))
+    if (hash !== ``) {
+      const element = document.getElementById(hash)
+      if (element) {
+        const offset = element.offsetTop
+        window.scrollTo(0, offset - offsetY)
+      }
     }
-  }
-  return null
+  }, 10)
 }
 
-exports.onInitialClientRender = (_, pluginOptions) => {
+history.listen(() => {
+  if (location.pathname === currentPathName) {
+    scrollToHash()
+  }
+})
+
+exports.onClientEntry = (args, pluginOptions) => {
   if (pluginOptions.offsetY) {
     offsetY = pluginOptions.offsetY
   }
-
-  requestAnimationFrame(() => {
-    const offset = getTargetOffset(window.location.hash)
-    if (offset !== null) {
-      window.scrollTo(0, offset)
-    }
-  })
 }
 
-exports.shouldUpdateScroll = ({ routerProps: { location } }) => {
-  const offset = getTargetOffset(location.hash)
-  return offset !== null ? [0, offset] : true
+exports.onRouteUpdate = ({ location }, pluginOptions) => {
+  scrollToHash()
+  currentPathName = location.pathname
 }

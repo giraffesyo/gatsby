@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { graphql } from "gatsby"
-import PostIcons from "../components/post-icons"
+import PostIcons from "../components/PostIcons"
 import Layout from "../layouts"
 
 import { rhythm } from "../utils/typography"

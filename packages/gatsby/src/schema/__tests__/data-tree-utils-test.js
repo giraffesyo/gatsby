@@ -93,7 +93,6 @@ describe(`Gatsby data tree utils`, () => {
           someOtherProperty: 3,
         },
       },
-      "": ``,
     },
   ]
 
@@ -103,10 +102,6 @@ describe(`Gatsby data tree utils`, () => {
 
   it(`skips null fields`, () => {
     expect(getExampleValues({ nodes }).iAmNull).not.toBeDefined()
-  })
-
-  it(`skips fields with key set to empty string`, () => {
-    expect(getExampleValues({ nodes })[``]).not.toBeDefined()
   })
 
   it(`should not mutate the nodes`, () => {
@@ -170,11 +165,11 @@ describe(`Gatsby data tree utils`, () => {
 
   it(`skips unsupported types`, () => {
     // Skips functions
-    let example = getExampleValues({ nodes: [{ foo: () => {} }] })
+    let example = getExampleValues([{ foo: () => {} }])
     expect(example.foo).not.toBeDefined()
 
     // Skips array of functions
-    example = getExampleValues({ nodes: [{ foo: [() => {}] }] })
+    example = getExampleValues([{ foo: [() => {}] }])
     expect(example.foo).not.toBeDefined()
   })
 

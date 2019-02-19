@@ -1,7 +1,6 @@
 import React from "react"
 import Modal from "react-modal"
-import { SkipNavLink } from "@reach/skip-nav"
-import { OutboundLink } from "gatsby-plugin-google-analytics"
+import Helmet from "react-helmet"
 import MdClose from "react-icons/lib/md/close"
 import { navigate, PageRenderer } from "gatsby"
 import presets, { colors } from "../utils/presets"
@@ -9,7 +8,6 @@ import Banner from "../components/banner"
 import Navigation from "../components/navigation"
 import MobileNavigation from "../components/navigation-mobile"
 import PageWithSidebar from "../components/page-with-sidebar"
-import SiteMetadata from "../components/site-metadata"
 
 import mousetrap from "mousetrap"
 
@@ -21,6 +19,7 @@ import "../fonts/Webfonts/futurapt_demiitalic_macroman/stylesheet.css"
 
 // Other fonts
 import "typeface-spectral"
+import "typeface-space-mono"
 
 let windowWidth
 
@@ -148,17 +147,39 @@ class DefaultLayout extends React.Component {
 
     return (
       <div className={isHomepage ? `is-homepage` : ``}>
-        <SiteMetadata pathname={this.props.location.pathname} />
-        <SkipNavLink css={styles.skipLink}>Skip to main content</SkipNavLink>
+        <Helmet defaultTitle={`GatsbyJS`} titleTemplate={`%s | GatsbyJS`}>
+          <meta name="twitter:site" content="@gatsbyjs" />
+          <meta name="og:type" content="website" />
+          <meta name="og:site_name" content="GatsbyJS" />
+          <link
+            rel="canonical"
+            href={`https://gatsbyjs.org${this.props.location.pathname}`}
+          />
+          <html lang="en" />
+        </Helmet>
         <Banner background={isHomepage ? `#402060` : false}>
-          {/* !!! If you change the children of Banner remember to do the same in layout/layout-with-heading.js */}
-          <OutboundLink
-            href="https://www.gatsbyjs.com/behind-the-scenes/"
-            css={{ color: `#fff`, "&:hover": { color: `#fff` } }}
+          These are the docs for v2.
+          {` `}
+          <a
+            href="https://v1.gatsbyjs.org/"
+            css={{
+              color: `#fff`,
+            }}
           >
-            Watch now
-          </OutboundLink>
-          {`: “Behind the Scenes: What makes Gatsby Great”.`}
+            View the v1 docs
+            <span
+              css={{
+                display: `none`,
+                [presets.Mobile]: {
+                  display: `inline`,
+                },
+              }}
+            >
+              {` `}
+              instead
+            </span>
+          </a>
+          .
         </Banner>
         <Navigation pathname={this.props.location.pathname} />
         <div
@@ -171,8 +192,6 @@ class DefaultLayout extends React.Component {
                 ? presets.bannerHeight
                 : `calc(${presets.bannerHeight} + ${presets.headerHeight})`,
             },
-            paddingLeft: `env(safe-area-inset-left)`,
-            paddingRight: `env(safe-area-inset-right)`,
           }}
         >
           <PageWithSidebar
@@ -187,32 +206,6 @@ class DefaultLayout extends React.Component {
       </div>
     )
   }
-}
-
-const styles = {
-  skipLink: {
-    border: `0`,
-    clip: `rect(0 0 0 0)`,
-    height: 1,
-    width: 1,
-    margin: -1,
-    padding: 0,
-    overflow: `hidden`,
-    position: `absolute`,
-    zIndex: 100,
-    fontSize: `0.85rem`,
-    ":focus": {
-      padding: `0.9rem`,
-      position: `fixed`,
-      top: 10,
-      left: 10,
-      background: `white`,
-      textDecoration: `none`,
-      width: `auto`,
-      height: `auto`,
-      clip: `auto`,
-    },
-  },
 }
 
 export default DefaultLayout

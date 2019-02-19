@@ -1,6 +1,5 @@
 const fetch = require(`./fetch`)
 const normalize = require(`./normalize`)
-const normalizeBaseUrl = require(`./normalize-base-url`)
 
 const typePrefix = `wordpress__`
 const refactoredEntityTypes = {
@@ -19,7 +18,6 @@ let _hostingWPCOM
 let _auth
 let _perPage
 let _concurrentRequests
-let _includedRoutes
 let _excludedRoutes
 let _normalizer
 
@@ -36,23 +34,19 @@ exports.sourceNodes = async (
     perPage = 100,
     searchAndReplaceContentUrls = {},
     concurrentRequests = 10,
-    includedRoutes = [`**`],
     excludedRoutes = [],
     normalizer,
   }
 ) => {
   const { createNode, touchNode } = actions
-  const normalizedBaseUrl = normalizeBaseUrl(baseUrl)
-
   _verbose = verboseOutput
-  _siteURL = `${protocol}://${normalizedBaseUrl}`
+  _siteURL = `${protocol}://${baseUrl}`
   _useACF = useACF
   _acfOptionPageIds = acfOptionPageIds
   _hostingWPCOM = hostingWPCOM
   _auth = auth
   _perPage = perPage
   _concurrentRequests = concurrentRequests
-  _includedRoutes = includedRoutes
   _excludedRoutes = excludedRoutes
   _normalizer = normalizer
 
@@ -66,7 +60,6 @@ exports.sourceNodes = async (
     _auth,
     _perPage,
     _concurrentRequests,
-    _includedRoutes,
     _excludedRoutes,
     typePrefix,
     refactoredEntityTypes,

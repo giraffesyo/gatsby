@@ -9,7 +9,7 @@ Array [
       "funny": "yup",
       "id": "foo",
       "internal": Object {
-        "contentDigest": "contentDigest",
+        "contentDigest": "8838e569ae02d98806532310fb2a577a",
         "type": "FooJson",
       },
       "parent": "whatever",
@@ -28,7 +28,7 @@ Array [
         "funny": "yup",
         "id": "foo",
         "internal": Object {
-          "contentDigest": "contentDigest",
+          "contentDigest": "8838e569ae02d98806532310fb2a577a",
           "type": "FooJson",
         },
         "parent": "whatever",
@@ -41,59 +41,10 @@ Array [
         "internal": Object {
           "contentDigest": "whatever",
           "mediaType": "application/json",
-          "type": "File",
+          "name": "test",
         },
         "name": "nodeName",
-        "parent": null,
-      },
-    },
-  ],
-]
-`;
-
-exports[`Process JSON nodes correctly correctly creates a node from JSON which is a single object and doesn't come from fs 1`] = `
-Array [
-  Array [
-    Object {
-      "blue": true,
-      "children": Array [],
-      "funny": "yup",
-      "id": "foo",
-      "internal": Object {
-        "contentDigest": "contentDigest",
-        "type": "NotFileJson",
-      },
-      "parent": "whatever",
-    },
-  ],
-]
-`;
-
-exports[`Process JSON nodes correctly correctly creates a node from JSON which is a single object and doesn't come from fs 2`] = `
-Array [
-  Array [
-    Object {
-      "child": Object {
-        "blue": true,
-        "children": Array [],
-        "funny": "yup",
-        "id": "foo",
-        "internal": Object {
-          "contentDigest": "contentDigest",
-          "type": "NotFileJson",
-        },
-        "parent": "whatever",
-      },
-      "parent": Object {
-        "children": Array [],
-        "content": "{\\"id\\":\\"foo\\",\\"blue\\":true,\\"funny\\":\\"yup\\"}",
-        "id": "whatever",
-        "internal": Object {
-          "contentDigest": "whatever",
-          "mediaType": "application/json",
-          "type": "NotFile",
-        },
-        "parent": null,
+        "parent": "SOURCE",
       },
     },
   ],
@@ -109,7 +60,7 @@ Array [
       "funny": "yup",
       "id": "foo",
       "internal": Object {
-        "contentDigest": "contentDigest",
+        "contentDigest": "8838e569ae02d98806532310fb2a577a",
         "type": "NodeNameJson",
       },
       "parent": "whatever",
@@ -122,7 +73,7 @@ Array [
       "funny": "nope",
       "id": "uuid-from-gatsby",
       "internal": Object {
-        "contentDigest": "contentDigest",
+        "contentDigest": "f624311d932d73dcd416d2a8bea2b67d",
         "type": "NodeNameJson",
       },
       "parent": "whatever",
@@ -141,7 +92,7 @@ Array [
         "funny": "yup",
         "id": "foo",
         "internal": Object {
-          "contentDigest": "contentDigest",
+          "contentDigest": "8838e569ae02d98806532310fb2a577a",
           "type": "NodeNameJson",
         },
         "parent": "whatever",
@@ -149,15 +100,14 @@ Array [
       "parent": Object {
         "children": Array [],
         "content": "[{\\"id\\":\\"foo\\",\\"blue\\":true,\\"funny\\":\\"yup\\"},{\\"blue\\":false,\\"funny\\":\\"nope\\"}]",
-        "dir": "/tmp/foo/",
         "id": "whatever",
         "internal": Object {
           "contentDigest": "whatever",
           "mediaType": "application/json",
-          "type": "File",
+          "name": "test",
         },
         "name": "nodeName",
-        "parent": null,
+        "parent": "SOURCE",
       },
     },
   ],
@@ -169,7 +119,7 @@ Array [
         "funny": "nope",
         "id": "uuid-from-gatsby",
         "internal": Object {
-          "contentDigest": "contentDigest",
+          "contentDigest": "f624311d932d73dcd416d2a8bea2b67d",
           "type": "NodeNameJson",
         },
         "parent": "whatever",
@@ -177,103 +127,14 @@ Array [
       "parent": Object {
         "children": Array [],
         "content": "[{\\"id\\":\\"foo\\",\\"blue\\":true,\\"funny\\":\\"yup\\"},{\\"blue\\":false,\\"funny\\":\\"nope\\"}]",
-        "dir": "/tmp/foo/",
         "id": "whatever",
         "internal": Object {
           "contentDigest": "whatever",
           "mediaType": "application/json",
-          "type": "File",
+          "name": "test",
         },
         "name": "nodeName",
-        "parent": null,
-      },
-    },
-  ],
-]
-`;
-
-exports[`Process JSON nodes correctly correctly creates nodes from JSON which is an array of objects and doesn't come from fs 1`] = `
-Array [
-  Array [
-    Object {
-      "blue": true,
-      "children": Array [],
-      "funny": "yup",
-      "id": "foo",
-      "internal": Object {
-        "contentDigest": "contentDigest",
-        "type": "NotFileJson",
-      },
-      "parent": "whatever",
-    },
-  ],
-  Array [
-    Object {
-      "blue": false,
-      "children": Array [],
-      "funny": "nope",
-      "id": "uuid-from-gatsby",
-      "internal": Object {
-        "contentDigest": "contentDigest",
-        "type": "NotFileJson",
-      },
-      "parent": "whatever",
-    },
-  ],
-]
-`;
-
-exports[`Process JSON nodes correctly correctly creates nodes from JSON which is an array of objects and doesn't come from fs 2`] = `
-Array [
-  Array [
-    Object {
-      "child": Object {
-        "blue": true,
-        "children": Array [],
-        "funny": "yup",
-        "id": "foo",
-        "internal": Object {
-          "contentDigest": "contentDigest",
-          "type": "NotFileJson",
-        },
-        "parent": "whatever",
-      },
-      "parent": Object {
-        "children": Array [],
-        "content": "[{\\"id\\":\\"foo\\",\\"blue\\":true,\\"funny\\":\\"yup\\"},{\\"blue\\":false,\\"funny\\":\\"nope\\"}]",
-        "id": "whatever",
-        "internal": Object {
-          "contentDigest": "whatever",
-          "mediaType": "application/json",
-          "type": "NotFile",
-        },
-        "parent": null,
-      },
-    },
-  ],
-  Array [
-    Object {
-      "child": Object {
-        "blue": false,
-        "children": Array [],
-        "funny": "nope",
-        "id": "uuid-from-gatsby",
-        "internal": Object {
-          "contentDigest": "contentDigest",
-          "type": "NotFileJson",
-        },
-        "parent": "whatever",
-      },
-      "parent": Object {
-        "children": Array [],
-        "content": "[{\\"id\\":\\"foo\\",\\"blue\\":true,\\"funny\\":\\"yup\\"},{\\"blue\\":false,\\"funny\\":\\"nope\\"}]",
-        "id": "whatever",
-        "internal": Object {
-          "contentDigest": "whatever",
-          "mediaType": "application/json",
-          "type": "NotFile",
-        },
-        "parent": null,
+        "parent": "SOURCE",
       },
     },
   ],

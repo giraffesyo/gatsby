@@ -8,8 +8,9 @@ export function buildPrefixer(prefix, ...paths) {
 // Webpack stats map to an array if source maps are enabled.
 // We normalize to make direct map.
 function normalizeStats(stats) {
-  return _.mapValues(stats.assetsByChunkName, script =>
-    _.isArray(script) ? script[0] : script
+  return _.mapValues(
+    stats.assetsByChunkName,
+    script => (_.isArray(script) ? script[0] : script)
   )
 }
 

@@ -1,8 +1,4 @@
 exports.onCreateBabelConfig = ({ actions }, pluginOptions) => {
-  if (pluginOptions.plugins) {
-    delete pluginOptions.plugins
-  }
-
   actions.setBabelPlugin({
     name: `babel-plugin-react-css-modules`,
     options: {

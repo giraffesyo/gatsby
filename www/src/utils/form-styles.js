@@ -1,4 +1,5 @@
 import presets, { colors } from "../utils/presets"
+import { style } from "glamor"
 import { rhythm, options } from "../utils/typography"
 
 export const formInput = {

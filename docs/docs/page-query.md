@@ -1,10 +1,10 @@
 ---
-title: Querying data in pages with GraphQL
+title: Querying data in pages with graphql
 ---
 
 Gatsby's `graphql` tag enables page components to retrieve data via GraphQL query.
 
-In this guide, you will learn [how to use the `graphql` tag](/docs/page-query#add-the-graphql-query) in your pages, as well as go a little deeper into [how the `graphql` tag works](/docs/page-query#how-does-the-graphql-tag-work).
+In this guide, you will learn [how to use the `graphql` tag](/page-query#adding-the-graphql-query) in your pages, as well as go a little deeper into [how the `graphql` tag works](/page-query#how-does-the-graphql-tag-work).
 
 ## How to use the `graphql` tag in pages
 
@@ -12,7 +12,9 @@ In this guide, you will learn [how to use the `graphql` tag](/docs/page-query#ad
 
 The first step in displaying the description will be ensuring you have one to begin with.
 
-```js:title=gatsby-config.js
+Inside of `gatsby-config.js`:
+
+```js
 module.exports = {
   siteMetadata: {
     title: "My Homepage",
@@ -25,7 +27,7 @@ module.exports = {
 
 A simple index page (`src/pages/index.js`) can be marked up like so:
 
-```jsx:title=src/pages/index.js
+```js
 import React from "react"
 
 const HomePage = () => {
@@ -39,7 +41,7 @@ export default HomePage
 
 The first thing to do is import `graphql` from Gatsby. At the top of `index.js` add:
 
-```diff:title=src/pages/index.js
+```diff
 import React from 'react'
 + import { graphql } from 'gatsby'
 
@@ -54,7 +56,7 @@ const HomePage = () => {
 
 Below our `HomePage` component declaration, export a new constant called `query`, and set its value to be a `graphql` [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) with the query between two backticks:
 
-```diff:title=src/pages/index.js
+```diff
 const HomePage = () => {
   return (
     <div>
@@ -74,7 +76,7 @@ From [browsing GraphiQL](/tutorial/part-five/#introducing-graphiql/), you'll fin
 
 Putting this together, the completed query looks like:
 
-```diff:title=src/pages/index.js
+```diff
 export const query = graphql`
 - # query will go here
 +  query HomePageQuery {
@@ -93,7 +95,7 @@ To start, update the `HomePage` component to destructure `data` from props.
 
 The `data` prop contains the results of the GraphQL query, and matches the shape you would expect. With this in mind, the updated `HomePage` markup looks like:
 
-```diff:title=src/pages/index.js
+```diff
 import React from 'react'
 import { graphql } from 'gatsby'
 
@@ -122,7 +124,7 @@ export default HomePage
 
 After restarting `gatsby develop`, your home page will now display "This is where I write my thoughts." from the description set in `gatsby-config.js`!
 
-## How does the `graphql` tag work?
+## How does the graphql tag work?
 
 `graphql` is a [tag function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Tagged_template_literals). Behind the scenes Gatsby handles these tags in a particular way:
 

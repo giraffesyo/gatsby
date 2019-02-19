@@ -1,8 +1,6 @@
-/* globals cy */
-
 describe(`The Home Page`, () => {
   it(`successfully loads`, () => {
-    cy.visit(`/`).waitForAPI(`onRouteUpdate`)
+    cy.visit(`/`).waitForRouteChange()
   })
 
   it(`contains the title with an SVG icon and text "Gatsbygram"`, () => {
@@ -13,14 +11,14 @@ describe(`The Home Page`, () => {
   it(`contains a link to about page in nav bar and it works`, () => {
     cy.getTestElement(`about-link`).contains(`About`)
     cy.getTestElement(`about-link`).click()
-    cy.waitForAPI(`onRouteUpdate`)
+    cy.waitForRouteChange()
       .location(`pathname`)
       .should(`equal`, `/about/`)
 
     // go back to home page
     cy.getTestElement(`site-title`).click()
 
-    cy.waitForAPI(`onRouteUpdate`)
+    cy.waitForRouteChange()
       .location(`pathname`)
       .should(`equal`, `/`)
   })
@@ -55,7 +53,7 @@ describe(`The Home Page`, () => {
         .first()
         .click()
 
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post.id)
 
@@ -69,7 +67,7 @@ describe(`The Home Page`, () => {
       cy.getTestElement(`post-detail-text`).contains(post.username)
       cy.getTestElement(`post-detail-text`).contains(post.text)
       cy.getTestElement(`modal-close`).click()
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .location(`pathname`)
         .should(`equal`, `/`)
     })
@@ -81,28 +79,28 @@ describe(`The Home Page`, () => {
         .first()
         .click()
 
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post1.id)
 
       // click right arrow icon to go to 2nd post
       cy.getTestElement(`next-post`).click()
 
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post2.id)
 
       // press left arrow to go back to 1st post
       cy.getTestElement(`previous-post`).click()
 
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post1.id)
 
       // close the post
       cy.getTestElement(`modal-close`).click()
 
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .location(`pathname`)
         .should(`equal`, `/`)
     })
@@ -116,7 +114,7 @@ describe(`The Home Page`, () => {
         .click()
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post1.id)
 
@@ -124,7 +122,7 @@ describe(`The Home Page`, () => {
       cy.get(`body`).type(`{rightarrow}`)
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post2.id)
 
@@ -132,7 +130,7 @@ describe(`The Home Page`, () => {
       cy.get(`body`).type(`{leftarrow}`)
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post1.id)
 
@@ -140,7 +138,7 @@ describe(`The Home Page`, () => {
       cy.getTestElement(`modal-close`).click()
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .location(`pathname`)
         .should(`equal`, `/`)
     })
@@ -154,7 +152,7 @@ describe(`The Home Page`, () => {
         .click()
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post1.id)
 
@@ -162,17 +160,17 @@ describe(`The Home Page`, () => {
       cy.get(`body`).type(`{rightarrow}`)
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .url()
         .should(`contain`, post2.id)
 
       // reload the page and go back
       cy.reload()
-        .waitForAPI(`onRouteUpdate`)
+        .waitForRouteChange()
         .go(`back`)
 
       // test if the first post exists
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .get(`div[to='/${post1.id}/']`)
         .should(`exist`)
 
@@ -180,7 +178,7 @@ describe(`The Home Page`, () => {
       cy.getTestElement(`modal-close`).click()
 
       // wait for page to transition
-      cy.waitForAPI(`onRouteUpdate`)
+      cy.waitForRouteChange()
         .location(`pathname`)
         .should(`equal`, `/`)
     })

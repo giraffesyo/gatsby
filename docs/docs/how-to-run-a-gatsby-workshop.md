@@ -1,6 +1,5 @@
 ---
 title: How to run a Gatsby workshop
-issue: https://github.com/gatsbyjs/gatsby/issues/8847
 ---
 
 This is a stub. Help our community expand it.

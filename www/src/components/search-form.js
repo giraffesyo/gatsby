@@ -10,27 +10,25 @@ import SearchIcon from "./search-icon"
 const loadJS = () => import(`./docsearch.min.js`)
 let loadedJs = false
 
-import { injectGlobal } from "react-emotion"
+import { css } from "glamor"
 
 const { curveDefault, speedDefault } = presets.animation
 
 // Override default search result styles (docsearch.css)
-const searchDropdownOffsetTop = rhythm(2)
-const homepageSearchDropdownOffsetTop = rhythm(4.5)
-
-injectGlobal`
+css.insert(`
   .algolia-autocomplete .ds-dropdown-menu {
     position: fixed !important;
-    top: calc(${searchDropdownOffsetTop} + ${presets.bannerHeight}) !important;
+    top: ${rhythm(2)} !important;
     left: ${rhythm(0.5)} !important;
     right: ${rhythm(0.5)} !important;
     min-width: calc(100vw - ${rhythm(1)}) !important;
     max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 5rem) !important;
     box-shadow: 0 3px 10px 0.05rem ${hex2rgba(colors.lilac, 0.25)} !important;
   }
 
   .is-homepage .algolia-autocomplete .ds-dropdown-menu {
-    top: ${homepageSearchDropdownOffsetTop} !important;
+    top: ${rhythm(2.5)} !important;
   }
 
   /* .searchWrap to beat docsearch.css' !important */
@@ -80,17 +78,8 @@ injectGlobal`
   }
 
   .algolia-autocomplete .ds-dropdown-menu [class^="ds-dataset-"] {
-    max-height: calc(100vh - ${presets.headerHeight} - ${
-  presets.bannerHeight
-}) !important;
     padding: 0 !important;
     border-color: ${colors.ui.bright} !important;
-  }
-
-  .is-homepage .algolia-autocomplete .ds-dropdown-menu [class^="ds-dataset-"] {
-    max-height: calc(100vh - ${homepageSearchDropdownOffsetTop} - ${
-  presets.headerHeight
-} - ${presets.bannerHeight}) !important;
   }
 
   .algolia-autocomplete .algolia-docsearch-suggestion--highlight {
@@ -180,11 +169,9 @@ injectGlobal`
       padding: ${rhythm(0.5)} ${rhythm(0.75)} !important;
     }
 
-    /* stylelint-disable */
     .algolia-autocomplete .algolia-docsearch-suggestion--category-header {
       padding: ${rhythm(0.5)} ${rhythm(0.75)} !important;
     }
-    /* stylelint-enable */
 
     .algolia-autocomplete .algolia-docsearch-suggestion--content {
       width: 70% !important;
@@ -213,18 +200,12 @@ injectGlobal`
   }
 
   @media ${presets.tablet} {
-    .algolia-autocomplete .ds-dropdown-menu,
-    .is-homepage .algolia-autocomplete .ds-dropdown-menu   {
+    .is-homepage .algolia-autocomplete .ds-dropdown-menu,
+    .algolia-autocomplete .ds-dropdown-menu {
       top: 100% !important;
       position: absolute !important;
       max-width: 600px !important;
       min-width: 500px !important;
-    }
-
-    .is-homepage .algolia-autocomplete .ds-dropdown-menu [class^="ds-dataset-"] {
-      max-height: calc(100vh - ${homepageSearchDropdownOffsetTop} - ${
-  presets.bannerHeight
-}) !important;
     }
 
     /* .searchWrap to beat docsearch.css' !important */
@@ -253,8 +234,7 @@ injectGlobal`
       max-width: 65% !important;
     }
   }
-`
-
+`)
 class SearchForm extends Component {
   constructor() {
     super()
@@ -275,10 +255,6 @@ class SearchForm extends Component {
     navigate(`${a.pathname}${a.hash}`)
   }
   init() {
-    if (this.algoliaInitialized) {
-      return
-    }
-
     window.addEventListener(
       `autocomplete:selected`,
       this.autocompleteSelected,
@@ -296,7 +272,6 @@ class SearchForm extends Component {
         keyboardShortcuts: [`s`],
       },
     })
-    this.algoliaInitialized = true
   }
   componentDidMount() {
     if (
@@ -313,23 +288,13 @@ class SearchForm extends Component {
       document.head.appendChild(link)
     }
   }
-  componentWillUnmount() {
-    window.removeEventListener(
-      `autocomplete:selected`,
-      this.autocompleteSelected,
-      true
-    )
-  }
   loadAlgoliaJS() {
-    if (!loadedJs) {
+    !loadedJs &&
       loadJS().then(a => {
         loadedJs = true
         window.docsearch = a.default
         this.init()
       })
-    } else {
-      this.init()
-    }
   }
   render() {
     const { focussed } = this.state

@@ -33,10 +33,10 @@ plugins: [
           options: {
             blocks: {
               danger: {
-                classes: "danger",
+                classes: "custom-block-danger",
               },
               info: {
-                classes: "info",
+                classes: "custom-block-info",
                 title: "optional",
               },
             },
@@ -62,12 +62,18 @@ This will generate the following html:
 
 ```html
 <div class="custom-block danger">
-  <div class="custom-block-body"><p>content</p></div>
+  <div class="custom-block-body">
+    <p>content</p>
+  </div>
 </div>
 
 <div class="custom-block info">
-  <div class="custom-block-heading">This is a title!</div>
-  <div class="custom-block-body"><p>content</p></div>
+  <div class="custom-block-heading">
+    This is a title!
+  </div>
+  <div class="custom-block-body">
+    <p>content</p>
+  </div>
 </div>
 ```
 
@@ -80,7 +86,7 @@ Here is an example configuration for using details:
 ```javascript
   blocks: {
     danger: {
-      classes: "danger",
+      classes: "custom-block-danger",
       details: true,
     },
     info: {
@@ -94,11 +100,17 @@ And here is the html output considering the same markdown as before:
 
 ```html
 <details class="custom-block danger">
-  <div class="custom-block-body"><p>content</p></div>
+  <div class="custom-block-body">
+    <p>content</p>
+  </div>
 </details>
 
 <details class="custom-block">
-  <summary class="custom-block-heading"> This is a title! </summary>
-  <div class="custom-block-body"><p>content</p></div>
+  <summary class="custom-block-heading">
+    This is a title!
+  </summary>
+  <div class="custom-block-body">
+    <p>content</p>
+  </div>
 </details>
 ```

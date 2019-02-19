@@ -1,6 +1,7 @@
 import React, { Fragment } from "react"
-import { Helmet } from "react-helmet"
+import Helmet from "react-helmet"
 import url from "url"
+import hex2rgba from "hex2rgba"
 import Img from "gatsby-image"
 import qs from "qs"
 
@@ -12,7 +13,7 @@ import Layout from "../components/layout"
 import ShareMenu from "../components/share-menu"
 
 import MdArrowUpward from "react-icons/lib/md/arrow-upward"
-import MdLink from "react-icons/lib/md/link"
+import MdLaunch from "react-icons/lib/md/launch"
 import FeaturedIcon from "../assets/featured-detailpage-featuredicon.svg"
 import FeatherIcon from "../assets/showcase-feather.svg"
 import GithubIcon from "react-icons/lib/go/mark-github"
@@ -103,11 +104,7 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
     query={graphql`
       query {
         allSitesYaml(
-          filter: {
-            featured: { eq: true }
-            main_url: { ne: null }
-            fields: { hasScreenshot: { eq: true } }
-          }
+          filter: { featured: { eq: true }, main_url: { ne: null } }
         ) {
           edges {
             node {
@@ -135,14 +132,12 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
       const allSitesYaml = staticData.allSitesYaml
       const nextSite = parent.getNext(allSitesYaml)
       const previousSite = parent.getPrevious(allSitesYaml)
-      const shouldShowVisitButtonOnMobile = !!data.sitesYaml.source_url
-      const { filters } = parent.props.location.state || {}
 
       return (
         <Layout
           location={parent.props.location}
           isModal={isModal}
-          modalBackgroundPath={parent.getExitLocation()}
+          modalBackgroundPath="/showcase"
           modalNext={() => parent.next(allSitesYaml)}
           modalPrevious={() => parent.previous(allSitesYaml)}
           modalNextLink={
@@ -150,7 +145,6 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
               to={nextSite.fields.slug}
               state={{
                 isModal: true,
-                filters,
               }}
               css={{
                 display: `block`,
@@ -203,7 +197,6 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
               to={previousSite.fields.slug}
               state={{
                 isModal: true,
-                filters,
               }}
               css={{
                 display: `block`,
@@ -271,7 +264,7 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
               <Helmet>
                 <title>{data.sitesYaml.title}</title>
                 <meta
-                  property="og:image"
+                  name="og:image"
                   content={`https://www.gatsbyjs.org${
                     data.sitesYaml.childScreenshot.screenshotFile
                       .childImageSharp.resize.src
@@ -433,71 +426,63 @@ const ShowcaseDetails = ({ parent, data, isModal, categories }) => (
                     <a href={data.sitesYaml.source_url}> Case Study </a>
                   </div>
                 )}
-                <div
-                  css={{
-                    alignSelf: `center`,
-                    marginLeft: `auto`,
-                  }}
-                >
-                  <div
-                    css={{
-                      position: `relative`,
-                      zIndex: 1,
-                      display: `flex`,
-                    }}
-                  >
-                    <a
-                      href={data.sitesYaml.main_url}
-                      css={{
-                        border: 0,
-                        borderRadius: presets.radius,
-                        color: colors.gatsby,
-                        display: shouldShowVisitButtonOnMobile ? `none` : null,
-                        fontFamily: options.headerFontFamily.join(`,`),
-                        fontWeight: `bold`,
-                        marginRight: rhythm(1.5 / 4),
-                        padding: `${rhythm(1 / 5)} ${rhythm(2 / 3)}`,
-                        textDecoration: `none`,
-                        WebkitFontSmoothing: `antialiased`,
-                        "&&": {
-                          backgroundColor: colors.gatsby,
-                          borderBottom: `none`,
-                          boxShadow: `none`,
-                          color: `white`,
-                          "&:hover": {
-                            backgroundColor: colors.gatsby,
-                          },
-                        },
-                        [shouldShowVisitButtonOnMobile && presets.Phablet]: {
-                          display: `block`,
-                        },
-                      }}
-                    >
-                      <MdLink
-                        style={{
-                          verticalAlign: `sub`,
-                        }}
-                      />
-                      Visit site
-                      {` `}
-                    </a>
-                    <ShareMenu
-                      css={{ display: `flex`, minWidth: 32, minHeight: 32 }}
-                      url={data.sitesYaml.main_url}
-                      title={data.sitesYaml.title}
-                      image={`https://www.gatsbyjs.org${
-                        data.sitesYaml.childScreenshot.screenshotFile
-                          .childImageSharp.resize.src
-                      }`}
-                    />
-                  </div>
-                </div>
               </div>
               <div
                 css={{
                   borderTop: `1px solid ${colors.ui.light}`,
+                  position: `relative`,
                 }}
               >
+                <div
+                  css={{
+                    position: `absolute`,
+                    right: gutter,
+                    top: gutter,
+                    left: `auto`,
+                    zIndex: 1,
+                    display: `flex`,
+                  }}
+                >
+                  <a
+                    href={data.sitesYaml.main_url}
+                    css={{
+                      border: 0,
+                      borderRadius: presets.radius,
+                      color: colors.gatsby,
+                      fontFamily: options.headerFontFamily.join(`,`),
+                      fontWeight: `bold`,
+                      marginRight: rhythm(1.5 / 4),
+                      padding: `${rhythm(1 / 5)} ${rhythm(2 / 3)}`,
+                      textDecoration: `none`,
+                      WebkitFontSmoothing: `antialiased`,
+                      "&&": {
+                        backgroundColor: colors.gatsby,
+                        borderBottom: `none`,
+                        boxShadow: `none`,
+                        color: `white`,
+                        "&:hover": {
+                          backgroundColor: colors.gatsby,
+                        },
+                      },
+                    }}
+                  >
+                    <MdLaunch
+                      style={{
+                        verticalAlign: `sub`,
+                      }}
+                    />
+                    Visit site
+                    {` `}
+                  </a>
+                  <ShareMenu
+                    url={data.sitesYaml.main_url}
+                    title={data.sitesYaml.title}
+                    image={`https://www.gatsbyjs.org${
+                      data.sitesYaml.childScreenshot.screenshotFile
+                        .childImageSharp.resize.src
+                    }`}
+                  />
+                </div>
                 <Img
                   key={data.sitesYaml.id}
                   fluid={

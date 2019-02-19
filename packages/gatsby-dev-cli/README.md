@@ -6,7 +6,7 @@ Gatsby packages to Gatsby sites that you're testing your changes on.
 
 ## Install
 
-`npm install -g gatsby-dev-cli`
+`npm install -g gatsby-dev-cli@canary`
 
 ## Configuration / First time setup
 

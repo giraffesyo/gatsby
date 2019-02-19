@@ -1,7 +1,7 @@
 import React from "react"
 import { Link, graphql } from "gatsby"
 import get from "lodash/get"
-import { Helmet } from "react-helmet"
+import Helmet from "react-helmet"
 
 import Layout from "../components/layout"
 import Bio from "../components/Bio"
@@ -18,9 +18,8 @@ class BlogIndex extends React.Component {
       <Layout location={this.props.location}>
         <Helmet title={siteTitle} />
         <Bio />
-        {posts
-          .filter(post => post.node.frontmatter.path !== `/404/`)
-          .map(post => {
+        {posts.map(post => {
+          if (post.node.frontmatter.path !== `/404/`) {
             const title = get(post, `node.frontmatter.title`) || post.node.path
             return (
               <div key={post.node.frontmatter.path}>
@@ -40,7 +39,8 @@ class BlogIndex extends React.Component {
                 <p dangerouslySetInnerHTML={{ __html: post.node.excerpt }} />
               </div>
             )
-          })}
+          }
+        })}
       </Layout>
     )
   }

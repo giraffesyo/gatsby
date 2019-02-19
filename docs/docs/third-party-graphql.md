@@ -2,19 +2,19 @@
 title: "Using third-party GraphQL APIs"
 ---
 
-Gatsby v2 introduces a simple way to integrate any GraphQL API into Gatsby's GraphQL. You can integrate both third-party APIs, like GitHub's, APIs of services like GraphCMS or your custom GraphQL API.
+Gatsby v2 introduces a simple way to integrate any GraphQL API into Gatsby's GraphQL. You can integrate both third-party APIs, like Github's, APIs of services like GraphCMS or your custom GraphQL API.
 
 ## Basic example
 
 First install the plugin.
 
 ```
-npm install gatsby-source-graphql
+yarn add gatsby-source-graphql
 ```
 
-Provided there is a GraphQL API under a `url`, adding it to an API just requires adding this to the config.
+Providing there is a GraphQL API under a `url`, adding it to an API just requires adding this to the config.
 
-```js:title=gatsby-config.js
+```js
 module.exports = {
   plugins: [
     {
@@ -66,7 +66,7 @@ Note that types of the third-party API will be prefixed with `${typeName}_`. You
 
 You can also create pages dynamically by adding a `createPages` callback in `gatsby-node.js`. For example you can create a page for every Star Wars species.
 
-```js:title=gatsby-node.js
+```js
 const path = require(`path`)
 
 exports.createPages = async ({ actions, graphql }) => {
@@ -93,10 +93,8 @@ exports.createPages = async ({ actions, graphql }) => {
 }
 ```
 
-## Further reading
+## Futher reading
 
 - [graphql-source-graphql docs](/packages/gatsby-source-graphql)
-- [Example with GitHub API](https://github.com/freiksenet/gatsby-github-displayer)
+- [Example with Github API](https://github.com/freiksenet/gatsby-github-displayer)
 - [Example with GraphCMS](https://github.com/freiksenet/gatsby-graphcms)
-- [Example with Hasura](https://github.com/hasura/graphql-engine/tree/master/community/boilerplates/gatsby-postgres-graphql)
-- [Example with AWS AppSync](https://github.com/aws-samples/aws-appsync-gatsby-sample)

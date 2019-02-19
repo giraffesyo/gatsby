@@ -1,32 +1,37 @@
-import React, { Fragment } from "react"
+import React, { Component, Fragment } from "react"
 import PluginSearchBar from "./plugin-searchbar-body"
 import { rhythm } from "../utils/typography"
 import presets, { colors } from "../utils/presets"
 import { scrollbarStyles } from "../utils/styles"
 
-const PageWithPluginSearchBar = ({ isPluginsIndex, location, children }) => (
-  <Fragment>
-    <section
-      css={{
-        ...styles.sidebar,
-        // mobile: hide PluginSearchBar when on gatsbyjs.org/packages/foo, aka package README page
-        display: !isPluginsIndex ? `none` : false,
-      }}
-    >
-      <PluginSearchBar location={location} />
-    </section>
-    <main
-      id={`reach-skip-nav`}
-      css={{
-        ...styles.content,
-        // mobile: hide README on gatsbyjs.org/plugins index page
-        display: isPluginsIndex ? `none` : false,
-      }}
-    >
-      {children}
-    </main>
-  </Fragment>
-)
+class PageWithPluginSearchBar extends Component {
+  render() {
+    return (
+      <Fragment>
+        <div
+          css={{
+            ...styles.sidebar,
+            // mobile: hide PluginSearchBar when on gatsbyjs.org/packages/foo, aka package README page
+            display: `${!this.props.isPluginsIndex && `none`}`,
+          }}
+        >
+          <PluginSearchBar location={this.props.location} />
+        </div>
+        <div
+          css={{
+            ...styles.content,
+            // mobile: hide README on gatsbyjs.org/plugins index page
+            display: `${this.props.isPluginsIndex && `none`}`,
+          }}
+        >
+          {this.props.children}
+        </div>
+      </Fragment>
+    )
+  }
+}
+
+export default PageWithPluginSearchBar
 
 const widthDefault = rhythm(14)
 const widthLarge = rhythm(16)
@@ -34,7 +39,7 @@ const widthLarge = rhythm(16)
 const styles = {
   sidebar: {
     height: `calc(100vh - ${presets.headerHeight})`,
-    width: `100%`,
+    width: `100vw`,
     zIndex: 1,
     top: `calc(${presets.headerHeight} + ${presets.bannerHeight} - 1px)`,
     ...scrollbarStyles,
@@ -59,5 +64,3 @@ const styles = {
     },
   },
 }
-
-export default PageWithPluginSearchBar

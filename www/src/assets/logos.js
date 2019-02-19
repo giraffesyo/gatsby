@@ -5,7 +5,6 @@ import ReactJSIcon from "./react.svg"
 import SegmentIcon from "./segment.svg"
 import FormidableIcon from "./formidable.svg"
 import FabricIcon from "./fabric.svg"
-import NetlifyIcon from "./netlify.svg"
 
 export {
   JSIcon,
@@ -15,5 +14,4 @@ export {
   SegmentIcon,
   FormidableIcon,
   FabricIcon,
-  NetlifyIcon,
 }

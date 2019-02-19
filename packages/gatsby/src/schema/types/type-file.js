@@ -6,9 +6,11 @@ const isRelativeUrl = require(`is-relative-url`)
 const normalize = require(`normalize-path`)
 const systemPath = require(`path`)
 
-const { getNodesByType } = require(`../../db/nodes`)
-const { findRootNodeAncestor } = require(`../../db/node-tracking`)
-const pageDependencyResolver = require(`../page-dependency-resolver`)
+const { getNodes } = require(`../../redux`)
+const { findRootNodeAncestor } = require(`../node-tracking`)
+const {
+  createPageDependency,
+} = require(`../../redux/actions/add-page-dependency`)
 const { joinPath } = require(`../../utils/path`)
 
 let type, listType
@@ -106,7 +108,7 @@ function pointsToFile(nodes, key, value) {
   }
 
   const pathToOtherNode = normalize(joinPath(rootNode.dir, value))
-  const otherFileExists = getNodesByType(`File`).some(
+  const otherFileExists = getNodes().some(
     n => n.absolutePath === pathToOtherNode
   )
   return otherFileExists
@@ -130,7 +132,7 @@ function createType(fileNodeRootType, isArray) {
 
   return Object.freeze({
     type: isArray ? new GraphQLList(fileNodeRootType) : fileNodeRootType,
-    resolve: pageDependencyResolver((node, args, context, { fieldName }) => {
+    resolve: (node, args, { path }, { fieldName }) => {
       let fieldValue = node[fieldName]
 
       if (!fieldValue) {
@@ -146,10 +148,18 @@ function createType(fileNodeRootType, isArray) {
 
         // Use that path to find the linked File node.
         const linkedFileNode = _.find(
-          getNodesByType(`File`),
-          n => n.absolutePath === fileLinkPath
+          getNodes(),
+          n => n.internal.type === `File` && n.absolutePath === fileLinkPath
         )
-        return linkedFileNode
+        if (linkedFileNode) {
+          createPageDependency({
+            path,
+            nodeId: linkedFileNode.id,
+          })
+          return linkedFileNode
+        } else {
+          return null
+        }
       }
 
       // Find the File node for this node (we assume the node is something
@@ -158,11 +168,11 @@ function createType(fileNodeRootType, isArray) {
 
       // Find the linked File node(s)
       if (isArray) {
-        return fieldValue.map(findLinkedFileNode)
+        return fieldValue.map(relativePath => findLinkedFileNode(relativePath))
       } else {
         return findLinkedFileNode(fieldValue)
       }
-    }),
+    },
   })
 }
 

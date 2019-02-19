@@ -40,7 +40,7 @@ The following fields are used by the page object and should be avoided.
   * \\"component\\"
   * \\"componentChunkName\\"
   * \\"pluginCreator___NODE\\"
-  * \\"pluginCreatorId\\"
+  * \\"pluginCreatorName\\"
 
             "
 `;
@@ -76,7 +76,6 @@ Map {
 
 exports[`Add pages allows you to add pages 1`] = `
 Object {
-  "contextModified": false,
   "payload": Object {
     "component": "/whatever/index.js",
     "componentChunkName": "component---whatever-index-js",
@@ -116,7 +115,6 @@ Map {
 
 exports[`Add pages allows you to add pages with context 1`] = `
 Object {
-  "contextModified": false,
   "payload": Object {
     "component": "/whatever/index.js",
     "componentChunkName": "component---whatever-index-js",
@@ -160,7 +158,6 @@ Map {
 
 exports[`Add pages allows you to add pages with matchPath 1`] = `
 Object {
-  "contextModified": false,
   "payload": Object {
     "component": "/whatever/index.js",
     "componentChunkName": "component---whatever-index-js",

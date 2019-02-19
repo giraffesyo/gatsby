@@ -6,13 +6,7 @@ const addLineNumbers = require(`./add-line-numbers`)
 
 module.exports = (
   { markdownAST },
-  {
-    classPrefix = `language-`,
-    inlineCodeMarker = null,
-    aliases = {},
-    noInlineHighlight = false,
-    showLineNumbers: showLineNumbersGlobal = false,
-  } = {}
+  { classPrefix = `language-`, inlineCodeMarker = null, aliases = {} } = {}
 ) => {
   const normalizeLanguage = lang => {
     const lower = lang.toLowerCase()
@@ -24,10 +18,9 @@ module.exports = (
     let {
       splitLanguage,
       highlightLines,
-      showLineNumbersLocal,
+      numberLines,
       numberLinesStartAt,
     } = parseLineNumberRange(language)
-    const showLineNumbers = showLineNumbersLocal || showLineNumbersGlobal
     language = splitLanguage
 
     // PrismJS's theme styles are targeting pre[class*="language-"]
@@ -50,7 +43,7 @@ module.exports = (
 
     let numLinesStyle, numLinesClass, numLinesNumber
     numLinesStyle = numLinesClass = numLinesNumber = ``
-    if (showLineNumbers) {
+    if (numberLines) {
       numLinesStyle = ` style="counter-reset: linenumber ${numberLinesStartAt -
         1}"`
       numLinesClass = ` line-numbers`
@@ -60,42 +53,35 @@ module.exports = (
     // Replace the node with the markup we need to make
     // 100% width highlighted code lines work
     node.type = `html`
-
-    let highlightClassName = `gatsby-highlight`
-    if (highlightLines && highlightLines.length > 0)
-      highlightClassName += ` has-highlighted-lines`
-
     // prettier-ignore
     node.value = ``
-    + `<div class="${highlightClassName}" data-language="${languageName}">`
+    + `<div class="gatsby-highlight" data-language="${languageName}">`
     +   `<pre${numLinesStyle} class="${className}${numLinesClass}">`
     +     `<code class="${className}">`
-    +       `${highlightCode(languageName, node.value, highlightLines)}`
+    +       `${highlightCode(language, node.value, highlightLines)}`
     +     `</code>`
     +     `${numLinesNumber}`
     +   `</pre>`
     + `</div>`
   })
 
-  if (!noInlineHighlight) {
-    visit(markdownAST, `inlineCode`, node => {
-      let languageName = `text`
+  visit(markdownAST, `inlineCode`, node => {
+    let languageName = `text`
 
-      if (inlineCodeMarker) {
-        let [language, restOfValue] = node.value.split(`${inlineCodeMarker}`, 2)
-        if (language && restOfValue) {
-          languageName = normalizeLanguage(language)
-          node.value = restOfValue
-        }
+    if (inlineCodeMarker) {
+      let [language, restOfValue] = node.value.split(`${inlineCodeMarker}`, 2)
+      if (language && restOfValue) {
+        languageName = normalizeLanguage(language)
+        node.value = restOfValue
       }
+    }
 
-      const className = `${classPrefix}${languageName}`
+    const className = `${classPrefix}${languageName}`
 
-      node.type = `html`
-      node.value = `<code class="${className}">${highlightCode(
-        languageName,
-        node.value
-      )}</code>`
-    })
-  }
+    node.type = `html`
+    node.value = `<code class="${className}">${highlightCode(
+      languageName,
+      node.value
+    )}</code>`
+  })
 }

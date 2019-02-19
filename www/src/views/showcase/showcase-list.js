@@ -13,11 +13,15 @@ import GithubIcon from "react-icons/lib/go/mark-github"
 import LaunchSiteIcon from "react-icons/lib/md/launch"
 import FeaturedIcon from "../../assets/featured-sites-icons--white.svg"
 
-const ShowcaseList = ({ items, count, filters }) => {
+const ShowcaseList = ({ items, count }) => {
   if (count) items = items.slice(0, count)
 
   return (
-    <main id={`reach-skip-nav`} css={{ ...styles.showcaseList }}>
+    <div
+      css={{
+        ...styles.showcaseList,
+      }}
+    >
       {items.map(
         ({ node }) =>
           node.fields &&
@@ -32,7 +36,6 @@ const ShowcaseList = ({ items, count, filters }) => {
                 slug={node.fields.slug}
                 image={node.childScreenshot}
                 title={node.title}
-                state={{ filters }}
               >
                 <strong className="title">{node.title}</strong>
               </ThumbnailLink>
@@ -77,7 +80,11 @@ const ShowcaseList = ({ items, count, filters }) => {
                 </div>
                 {node.featured && (
                   <Link
-                    css={{ "&&": { ...styles.featuredItem } }}
+                    css={{
+                      "&&": {
+                        ...styles.featuredItem,
+                      },
+                    }}
                     to={`/showcase?${qs.stringify({
                       filters: `Featured`,
                     })}`}
@@ -86,7 +93,9 @@ const ShowcaseList = ({ items, count, filters }) => {
                     <img
                       src={FeaturedIcon}
                       alt="icon"
-                      css={{ ...styles.featuredIcon }}
+                      css={{
+                        ...styles.featuredIcon,
+                      }}
                     />
                   </Link>
                 )}
@@ -95,7 +104,7 @@ const ShowcaseList = ({ items, count, filters }) => {
           )
       )}
       {items.length && <EmptyGridItems styles={styles.showcaseItem} />}
-    </main>
+    </div>
   )
 }
 

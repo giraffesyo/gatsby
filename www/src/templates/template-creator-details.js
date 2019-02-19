@@ -1,89 +1,42 @@
 import React, { Component } from "react"
 import { graphql, Link } from "gatsby"
 import Layout from "../components/layout"
-import { Helmet } from "react-helmet"
-import typography, { rhythm, scale, options } from "../utils/typography"
+import Helmet from "react-helmet"
+import typography, { rhythm, scale } from "../utils/typography"
 import Img from "gatsby-image"
-import CreatorsHeader from "../views/creators/creators-header"
-import Badge from "../views/creators/badge"
+import CommunityHeader from "../views/community/community-header"
 import presets, { colors } from "../utils/presets"
 import GithubIcon from "react-icons/lib/go/mark-github"
 
-const removeProtocol = input => input.replace(/^https?:\/\//, ``)
-
-const breakpoint2Columns = presets.Tablet
-
-const MetaTitle = ({ children }) => (
-  <p
-    css={{
-      margin: `0`,
-      textTransform: `uppercase`,
-      color: colors.gray.calm,
-      letterSpacing: `0.03em`,
-      ...scale(-1 / 3),
-      marginBottom: rhythm(options.blockMarginBottom / 4),
-      [presets.Mobile]: {
-        width: 150,
-      },
-      [breakpoint2Columns]: {
-        fontWeight: `600`,
-        letterSpacing: 0,
-        ...scale(0),
-        marginBottom: 0,
-        color: colors.gray.dark,
-        textTransform: `none`,
-      },
-    }}
-  >
-    {children}
-  </p>
-)
-
-const MetaSection = ({ children, background, last, first }) => (
-  <div
-    css={{
-      background: background ? background : colors.ui.whisper,
-      marginLeft: rhythm(-3 / 4),
-      marginRight: rhythm(-3 / 4),
-      padding: rhythm(3 / 4),
-      borderTop: first ? `1px solid ${colors.ui.light}` : null,
-      borderBottom: last ? null : `1px solid ${colors.ui.light}`,
-      [breakpoint2Columns]: {
-        background: `transparent`,
-        paddingLeft: 0,
-        paddingRight: 0,
-        marginLeft: 0,
-        marginRight: 0,
-      },
-      [presets.Phablet]: {
-        display: `flex`,
-      },
-    }}
-  >
-    {children}
-  </div>
-)
-
 class CreatorTemplate extends Component {
-  render() {
-    const { data, location } = this.props
-    const creator = data.creatorsYaml
-    const isAgencyOrCompany =
-      creator.type === `agency` || creator.type === `company`
+  constructor(props) {
+    super(props)
+    this.state = { sites: [] }
+  }
 
+  componentDidMount() {
+    this.generateThumbnails()
+  }
+
+  generateThumbnails = () => {
     let sites = []
-    data.allSitesYaml.edges.map(site => {
+    let creator = this.props.data.creatorsYaml
+    this.props.data.allSitesYaml.edges.map(site => {
       if (site.node.built_by === creator.name) {
         sites.push(site)
       }
     })
-
+    this.setState({ sites: sites })
+  }
+  render() {
+    const { data, location } = this.props
+    const creator = data.creatorsYaml
     return (
       <Layout location={location}>
         <Helmet>
           <title>{creator.name}</title>
         </Helmet>
-        <CreatorsHeader submissionText="Add Yourself" />
+        <CommunityHeader submissionText="Add Yourself" />
         <main
           role="main"
           css={{
@@ -94,8 +47,12 @@ class CreatorTemplate extends Component {
             alignItems: `center`,
             justifyContent: `center`,
             width: `100%`,
-            [breakpoint2Columns]: {
+            ...scale(-1 / 4),
+            [presets.Tablet]: {
+              ...scale(),
               paddingBottom: rhythm(3 / 4),
+            },
+            [presets.Desktop]: {
               flexDirection: `row`,
               alignItems: `flex-start`,
             },
@@ -105,118 +62,111 @@ class CreatorTemplate extends Component {
           <div
             css={{
               margin: rhythm(3 / 4),
-              marginBottom: rhythm(options.blockMarginBottom / 4),
               flexGrow: `1`,
               width: `100%`,
-              [breakpoint2Columns]: {
-                width: `auto`,
-                maxWidth: 480,
-              },
               [presets.Desktop]: {
-                maxWidth: 560,
+                width: `auto`,
+                maxWidth: `720`,
               },
             }}
           >
             <Img
               alt={`${creator.name}`}
-              css={{ borderRadius: presets.radius }}
               fluid={creator.image.childImageSharp.fluid}
             />
           </div>
           <div
             css={{
+              display: `flex`,
+              flexDirection: `column`,
               margin: rhythm(3 / 4),
               flex: `1`,
               width: `100%`,
               [presets.Desktop]: {
                 width: `auto`,
-                maxWidth: 640,
+                maxWidth: `720`,
               },
             }}
           >
-            <h1
-              css={{
-                margin: `0`,
-              }}
-            >
-              {creator.name}
-            </h1>
+            {creator.for_hire || creator.hiring ? (
+              <div css={[styles.badge]}>
+                {creator.for_hire ? `Open For Work` : `Hiring`}
+              </div>
+            ) : null}
             <div
               css={{
-                alignItems: `center`,
                 display: `flex`,
-                marginTop: rhythm(options.blockMarginBottom / 2),
+                borderBottom: `2px solid black`,
+                alignItems: `center`,
               }}
             >
-              {isAgencyOrCompany && (
-                <span
-                  css={{
-                    color: colors.gray.calm,
-                    marginRight: `.5rem`,
-                  }}
-                >
-                  {creator.type.charAt(0).toUpperCase() + creator.type.slice(1)}
-                </span>
-              )}
-
-              {creator.for_hire || creator.hiring ? (
-                <div
-                  css={{
-                    alignSelf: `flex-start`,
-                    ...scale(-1 / 3),
-                    marginRight: `.5rem`,
-                  }}
-                >
-                  <Badge
-                    forHire={creator.for_hire}
-                    customCSS={{
-                      background: colors.success,
-                      color: `#fff`,
-                    }}
-                  >
-                    {creator.for_hire ? `Open for work` : `Hiring`}
-                  </Badge>
-                </div>
-              ) : null}
+              <h1
+                css={{
+                  textTransform: `uppercase`,
+                  margin: `0`,
+                }}
+              >
+                {creator.name}
+              </h1>
               {creator.github && (
-                <a
-                  href={creator.github}
+                <GithubIcon
                   css={{
-                    "& svg": { display: `block` },
-                    "&&": {
-                      border: 0,
-                      boxShadow: `none`,
-                      lineHeight: 1,
-                      "&:hover": {
-                        background: `none`,
-                        color: colors.gatsby,
-                      },
-                    },
+                    marginLeft: `auto`,
                   }}
-                >
-                  <GithubIcon />
-                </a>
+                />
               )}
             </div>
             <div
               css={{
+                borderBottom: `2px solid black`,
                 padding: `${rhythm()} 0`,
               }}
             >
               {creator.description}
             </div>
-            <MetaSection first>
-              <MetaTitle>Get in touch</MetaTitle>
+            <div
+              css={{
+                borderBottom: `2px solid black`,
+                padding: `${rhythm(3 / 4)} 0`,
+                display: `flex`,
+              }}
+            >
+              <p
+                css={{
+                  margin: `0`,
+                  textDecoration: `underline`,
+                  fontWeight: `600`,
+                  width: `150`,
+                }}
+              >
+                Get in touch
+              </p>
               <a
                 href={creator.website}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {removeProtocol(creator.website)}
+                {creator.website}
               </a>
-            </MetaSection>
-            <MetaSection>
-              <MetaTitle>From</MetaTitle>
+            </div>
+            <div
+              css={{
+                borderBottom: `2px solid black`,
+                padding: `${rhythm(3 / 4)} 0`,
+                display: `flex`,
+              }}
+            >
+              <p
+                css={{
+                  margin: `0`,
+                  textDecoration: `underline`,
+                  fontWeight: `600`,
+
+                  width: `150`,
+                }}
+              >
+                From
+              </p>
               <p
                 css={{
                   margin: `0`,
@@ -224,17 +174,32 @@ class CreatorTemplate extends Component {
               >
                 {creator.location}
               </p>
-            </MetaSection>
-            {creator.portfolio === true && sites.length > 0 && (
-              <MetaSection background="transparent" last>
-                <MetaTitle>Worked On</MetaTitle>
+            </div>
+            {creator.portfolio === true && (
+              <div
+                css={{
+                  borderBottom: `2px solid black`,
+                  padding: `${rhythm(3 / 4)} 0`,
+                }}
+              >
+                <p
+                  css={{
+                    margin: `0`,
+                    marginBottom: rhythm(3 / 4),
+                    textDecoration: `underline`,
+                    fontWeight: `600`,
+                    width: `150`,
+                  }}
+                >
+                  Worked On
+                </p>
                 <div
                   css={{
                     display: `flex`,
                     alignItems: `flex-start`,
                   }}
                 >
-                  {sites.map(site => (
+                  {this.state.sites.map(site => (
                     <Link
                       key={site.node.title}
                       css={{
@@ -262,7 +227,7 @@ class CreatorTemplate extends Component {
                     </Link>
                   ))}
                 </div>
-              </MetaSection>
+              </div>
             )}
           </div>
         </main>
@@ -291,12 +256,11 @@ export const pageQuery = graphql`
       for_hire
       hiring
       portfolio
-      type
       fields {
         slug
       }
     }
-    allSitesYaml(filter: { fields: { hasScreenshot: { eq: true } } }) {
+    allSitesYaml {
       edges {
         node {
           built_by
@@ -319,3 +283,16 @@ export const pageQuery = graphql`
     }
   }
 `
+
+const styles = {
+  badge: {
+    ...scale(-1 / 3),
+    padding: `${rhythm(1 / 4)} 1.6rem`,
+    marginBottom: `${rhythm(3 / 4)}`,
+    borderRadius: `20px`,
+    alignSelf: `flex-start`,
+    color: `white`,
+    background: colors.gatsby,
+    textTransform: `uppercase`,
+  },
+}

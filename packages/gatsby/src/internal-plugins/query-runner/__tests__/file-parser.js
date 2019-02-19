@@ -80,27 +80,6 @@ export const fragment3 = graphql\`
   }
 \`
 `,
-    "fragment-shorthand.js": `import React from "react"
-import { StaticQuery, graphql } from "gatsby"
-
-const query = graphql\`
-  query {
-    site {
-      siteMetadata {
-        title
-      }
-    }
-  }
-\`
-
-export default () => (
-  <>
-    <StaticQuery
-      query={query}
-      render={data => <div>{data.title}</div>}
-    />
-  </>
-)`,
     "query-in-separate-variable.js": `import React from "react"
 import { StaticQuery, graphql } from "gatsby"
 

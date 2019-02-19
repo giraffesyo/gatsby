@@ -11,12 +11,7 @@ function generateIcons(icons, srcIcon) {
     const size = parseInt(icon.sizes.substring(0, icon.sizes.lastIndexOf(`x`)))
     const imgPath = path.join(`public`, icon.src)
 
-    // For vector graphics, instruct sharp to use a pixel density
-    // suitable for the resolution we're rasterizing to.
-    // For pixel graphics sources this has no effect.
-    // Sharp accept density from 1 to 2400
-    const density = Math.min(2400, Math.max(1, size))
-    return sharp(srcIcon, { density })
+    return sharp(srcIcon)
       .resize(size)
       .toFile(imgPath)
       .then(() => {})
@@ -25,13 +20,12 @@ function generateIcons(icons, srcIcon) {
 
 exports.onPostBootstrap = (args, pluginOptions) =>
   new Promise((resolve, reject) => {
-    const { icon, ...manifest } = pluginOptions
+    const { icon } = pluginOptions
+    const manifest = { ...pluginOptions }
 
     // Delete options we won't pass to the manifest.webmanifest.
-
     delete manifest.plugins
-    delete manifest.legacy
-    delete manifest.theme_color_in_head
+    delete manifest.icon
 
     // If icons are not manually defined, use the default icon set.
     if (!manifest.icons) {
@@ -39,7 +33,10 @@ exports.onPostBootstrap = (args, pluginOptions) =>
     }
 
     // Determine destination path for icons.
-    const iconPath = path.join(`public`, path.dirname(manifest.icons[0].src))
+    const iconPath = path.join(
+      `public`,
+      manifest.icons[0].src.substring(0, manifest.icons[0].src.lastIndexOf(`/`))
+    )
 
     //create destination directory if it doesn't exist
     if (!fs.existsSync(iconPath)) {

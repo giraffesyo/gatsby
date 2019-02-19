@@ -5,7 +5,7 @@ import Img from "gatsby-image"
 import styles from "./styles"
 import presets from "../../utils/presets"
 
-const ThumbnailLink = ({ slug, image, title, children, state }) => {
+const ThumbnailLink = ({ slug, image, title, children }) => {
   let screenshot = false
 
   // site showcase
@@ -19,9 +19,9 @@ const ThumbnailLink = ({ slug, image, title, children, state }) => {
   return (
     <Link
       to={slug}
-      state={{ isModal: true, ...state }}
+      state={{ isModal: true }}
+      {...styles.withTitleHover}
       css={{
-        ...styles.withTitleHover,
         "&&": {
           borderBottom: `none`,
           boxShadow: `none`,

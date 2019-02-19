@@ -9,7 +9,7 @@
     "prettier/flowtype",
     "prettier/react"
   ],
-  "plugins": ["flowtype", "prettier", "react", "filenames"],
+  "plugins": ["flowtype", "react"],
   "parserOptions": {
     "ecmaVersion": 2016,
     "sourceType": "module",
@@ -24,34 +24,39 @@
     "jest": true
   },
   "globals": {
-    "before": true,
-    "spyOn": true,
-    "__PATH_PREFIX__": true
+    "spyOn": true
   },
   "rules": {
+    "no-console": "off",
+    "no-inner-declarations": "off",
+    "valid-jsdoc": "off",
+    "require-jsdoc": "off",
+    "quotes": ["error", "backtick"],
+    "consistent-return": ["error"],
     "arrow-body-style": [
       "error",
       "as-needed",
       { "requireReturnForObjectLiteral": true }
     ],
-    "no-unused-expressions": [
+    "jsx-quotes": ["error", "prefer-double"],
+    "semi": ["error", "never"],
+    "object-curly-spacing": ["error", "always"],
+    "comma-dangle": [
       "error",
       {
-        "allowTaggedTemplates": true
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "ignore"
       }
     ],
-    "consistent-return": ["error"],
-    "filenames/match-regex": ["error", "^[a-z-\\d\\.]+$", true],
-    "no-console": "off",
-    "no-inner-declarations": "off",
-    "prettier/prettier": "error",
-    "quotes": ["error", "backtick"],
-    "react/display-name": "off",
-    "react/jsx-key": "warn",
-    "react/no-unescaped-entities": "warn",
-    "react/prop-types": "off",
-    "require-jsdoc": "off",
-    "valid-jsdoc": "off"
+    "react/prop-types": [
+      "error",
+      {
+        "ignore": ["children"]
+      }
+    ]
   },
   "overrides": [
     {
@@ -66,18 +71,6 @@
         "___loader": false,
         "___emitter": false
       }
-    },
-    {
-      "files": ["**/cypress/integration/**/*", "**/cypress/support/**/*"],
-      "globals": {
-        "cy": false,
-        "Cypress": false
-      }
     }
-  ],
-  "settings": {
-    "react": {
-      "version": "16.4.2"
-    }
-  }
+  ]
 }

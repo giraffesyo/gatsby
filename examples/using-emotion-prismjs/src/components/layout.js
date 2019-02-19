@@ -2,7 +2,7 @@ import React, { Fragment } from "react"
 import { Link, StaticQuery, graphql } from "gatsby"
 import PropTypes from "prop-types"
 import { css } from "react-emotion"
-import { Helmet } from "react-helmet"
+import Helmet from "react-helmet"
 
 import { rhythm } from "../utils/typography"
 import "../prism-styles"
@@ -19,7 +19,7 @@ const link = css`
   color: inherit;
 `
 
-class PureLayout extends React.Component {
+class Layout extends React.Component {
   render() {
     const HeadingTag = this.props.isIndex ? `h1` : `h3`
     const { siteTitle, pageTitle } = this.props
@@ -35,6 +35,7 @@ class PureLayout extends React.Component {
           />
           <meta name="referrer" content="origin" />
         </Helmet>
+        ` `
         <div className={indexContainer}>
           <HeadingTag>
             <Link className={link} to={`/`}>
@@ -48,7 +49,7 @@ class PureLayout extends React.Component {
   }
 }
 
-PureLayout.propTypes = {
+Layout.propTypes = {
   siteTitle: PropTypes.string.isRequired,
   pageTitle: PropTypes.string,
   isIndex: PropTypes.bool,
@@ -65,13 +66,11 @@ const query = graphql`
   }
 `
 
-const Layout = props => (
+export default props => (
   <StaticQuery
     query={query}
     render={data => (
-      <PureLayout siteTitle={data.site.siteMetadata.title} {...props} />
+      <Layout siteTitle={data.site.siteMetadata.title} {...props} />
     )}
   />
 )
-
-export default Layout

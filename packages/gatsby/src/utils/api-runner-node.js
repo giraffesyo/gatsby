@@ -4,10 +4,9 @@ const _ = require(`lodash`)
 
 const tracer = require(`opentracing`).globalTracer()
 const reporter = require(`gatsby-cli/lib/reporter`)
-const getCache = require(`./get-cache`)
+const cache = require(`./cache`)
 const apiList = require(`./api-node-docs`)
 const createNodeId = require(`./create-node-id`)
-const createContentDigest = require(`./create-content-digest`)
 
 // Bind action creators per plugin so we can auto-add
 // metadata to actions they create.
@@ -66,15 +65,15 @@ const runAPI = (plugin, api, args) => {
     pluginSpan.setTag(`plugin`, plugin.name)
 
     let pathPrefix = ``
-    const { store, emitter } = require(`../redux`)
     const {
+      store,
+      emitter,
       loadNodeContent,
       getNodes,
       getNode,
-      getNodesByType,
       hasNodeChanged,
       getNodeAndSavePathDependency,
-    } = require(`../db/nodes`)
+    } = require(`../redux`)
     const { boundActionCreators } = require(`../redux/actions`)
 
     const doubleBoundActionCreators = doubleBind(
@@ -92,8 +91,6 @@ const runAPI = (plugin, api, args) => {
 
     const tracing = initAPICallTracing(pluginSpan)
 
-    const cache = getCache(plugin.name)
-
     const apiCallArgs = [
       {
         ...args,
@@ -103,16 +100,13 @@ const runAPI = (plugin, api, args) => {
         loadNodeContent,
         store,
         emitter,
-        getCache,
         getNodes,
         getNode,
-        getNodesByType,
         hasNodeChanged,
         reporter,
         getNodeAndSavePathDependency,
         cache,
         createNodeId: namespacedCreateNodeId,
-        createContentDigest,
         tracing,
       },
       plugin.pluginOptions,
@@ -158,7 +152,8 @@ module.exports = async (api, args = {}, pluginSource) =>
 
     // Check that the API is documented.
     if (!apiList[api]) {
-      reporter.panic(`api: "${api}" is not a valid Gatsby api`)
+      reporter.error(`api: "${api}" is not a valid Gatsby api`)
+      process.exit()
     }
 
     const { store } = require(`../redux`)
@@ -207,13 +202,9 @@ module.exports = async (api, args = {}, pluginSource) =>
     } else if (api === `onCreatePage`) {
       id = `${api}${apiRunInstance.startTime}${args.page.path}${args.traceId}`
     } else {
-      // When tracing is turned on, the `args` object will have a
-      // `parentSpan` field that can be quite large. So we omit it
-      // before calling stringify
-      const argsJson = JSON.stringify(_.omit(args, `parentSpan`))
       id = `${api}|${apiRunInstance.startTime}|${
         apiRunInstance.traceId
-      }|${argsJson}`
+      }|${JSON.stringify(args)}`
     }
     apiRunInstance.id = id
 
@@ -229,53 +220,64 @@ module.exports = async (api, args = {}, pluginSource) =>
       apisRunningByTraceId.set(apiRunInstance.traceId, 1)
     }
 
-    Promise.mapSeries(noSourcePluginPlugins, plugin => {
-      let pluginName =
-        plugin.name === `default-site-plugin`
-          ? `gatsby-node.js`
-          : `Plugin ${plugin.name}`
+    let pluginName = null
 
-      return new Promise(resolve => {
-        resolve(runAPI(plugin, api, { ...args, parentSpan: apiSpan }))
-      }).catch(err => {
-        reporter.panicOnBuild(`${pluginName} returned an error`, err)
+    Promise.mapSeries(noSourcePluginPlugins, plugin => {
+      if (plugin.name === `default-site-plugin`) {
+        pluginName = `gatsby-node.js`
+      } else {
+        pluginName = `Plugin ${plugin.name}`
+      }
+      return Promise.resolve(
+        runAPI(plugin, api, { ...args, parentSpan: apiSpan })
+      )
+    })
+      .catch(err => {
+        if (err) {
+          if (process.env.NODE_ENV === `production`) {
+            return reporter.panic(`${pluginName} returned an error`, err)
+          }
+          return reporter.error(`${pluginName} returned an error`, err)
+        }
         return null
       })
-    }).then(results => {
-      // Remove runner instance
-      apisRunningById.delete(apiRunInstance.id)
-      const currentCount = apisRunningByTraceId.get(apiRunInstance.traceId)
-      apisRunningByTraceId.set(apiRunInstance.traceId, currentCount - 1)
+      .then(results => {
+        // Remove runner instance
+        apisRunningById.delete(apiRunInstance.id)
+        const currentCount = apisRunningByTraceId.get(apiRunInstance.traceId)
+        apisRunningByTraceId.set(apiRunInstance.traceId, currentCount - 1)
 
-      if (apisRunningById.size === 0) {
-        const { emitter } = require(`../redux`)
-        emitter.emit(`API_RUNNING_QUEUE_EMPTY`)
-      }
-
-      // Filter empty results
-      apiRunInstance.results = results.filter(result => !_.isEmpty(result))
-
-      // Filter out empty responses and return if the
-      // api caller isn't waiting for cascading actions to finish.
-      if (!args.waitForCascadingActions) {
-        apiSpan.finish()
-        resolve(apiRunInstance.results)
-      }
-
-      // Check if any of our waiters are done.
-      waitingForCasacadeToFinish = waitingForCasacadeToFinish.filter(
-        instance => {
-          // If none of its trace IDs are running, it's done.
-          const apisByTraceIdCount = apisRunningByTraceId.get(instance.traceId)
-          if (apisByTraceIdCount === 0) {
-            instance.span.finish()
-            instance.resolve(instance.results)
-            return false
-          } else {
-            return true
-          }
+        if (apisRunningById.size === 0) {
+          const { emitter } = require(`../redux`)
+          emitter.emit(`API_RUNNING_QUEUE_EMPTY`)
         }
-      )
-      return
-    })
+
+        // Filter empty results
+        apiRunInstance.results = results.filter(result => !_.isEmpty(result))
+
+        // Filter out empty responses and return if the
+        // api caller isn't waiting for cascading actions to finish.
+        if (!args.waitForCascadingActions) {
+          apiSpan.finish()
+          resolve(apiRunInstance.results)
+        }
+
+        // Check if any of our waiters are done.
+        waitingForCasacadeToFinish = waitingForCasacadeToFinish.filter(
+          instance => {
+            // If none of its trace IDs are running, it's done.
+            const apisByTraceIdCount = apisRunningByTraceId.get(
+              instance.traceId
+            )
+            if (apisByTraceIdCount === 0) {
+              instance.span.finish()
+              instance.resolve(instance.results)
+              return false
+            } else {
+              return true
+            }
+          }
+        )
+        return
+      })
   })

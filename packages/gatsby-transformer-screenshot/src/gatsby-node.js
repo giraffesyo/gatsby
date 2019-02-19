@@ -1,10 +1,10 @@
+const crypto = require(`crypto`)
 const axios = require(`axios`)
 const Queue = require(`better-queue`)
 const { createRemoteFileNode } = require(`gatsby-source-filesystem`)
 
 const SCREENSHOT_ENDPOINT = `https://h7iqvn4842.execute-api.us-east-2.amazonaws.com/prod/screenshot`
 const LAMBDA_CONCURRENCY_LIMIT = 50
-const USE_PLACEHOLDER_IMAGE = process.env.GATSBY_SCREENSHOT_PLACEHOLDER
 
 const screenshotQueue = new Queue(
   (input, cb) => {
@@ -15,12 +15,20 @@ const screenshotQueue = new Queue(
   { concurrent: LAMBDA_CONCURRENCY_LIMIT, maxRetries: 3, retryDelay: 1000 }
 )
 
+const createContentDigest = obj =>
+  crypto
+    .createHash(`md5`)
+    .update(JSON.stringify(obj))
+    .digest(`hex`)
+
 exports.onPreBootstrap = (
-  { store, cache, actions, createNodeId, getNodesByType, createContentDigest },
+  { store, cache, actions, createNodeId, getNodes },
   pluginOptions
 ) => {
   const { createNode, touchNode } = actions
-  const screenshotNodes = getNodesByType(`Screenshot`)
+  const screenshotNodes = getNodes().filter(
+    n => n.internal.type === `Screenshot`
+  )
 
   if (screenshotNodes.length === 0) {
     return null
@@ -28,13 +36,10 @@ exports.onPreBootstrap = (
 
   let anyQueued = false
 
-  // Check for updated screenshots and placeholder flag
+  // Check for updated screenshots
   // and prevent Gatsby from garbage collecting remote file nodes
   screenshotNodes.forEach(n => {
-    if (
-      (n.expires && new Date() >= new Date(n.expires)) ||
-      USE_PLACEHOLDER_IMAGE !== n.usingPlaceholder
-    ) {
+    if (n.expires && new Date() >= new Date(n.expires)) {
       anyQueued = true
       // Screenshot expired, re-run Lambda
       screenshotQueue.push({
@@ -44,7 +49,6 @@ exports.onPreBootstrap = (
         cache,
         createNode,
         createNodeId,
-        createContentDigest,
       })
     } else {
       // Screenshot hasn't yet expired, touch the image node
@@ -65,7 +69,7 @@ exports.onPreBootstrap = (
 }
 
 exports.onCreateNode = async (
-  { node, actions, store, cache, createNodeId, createContentDigest },
+  { node, actions, store, cache, createNodeId },
   pluginOptions
 ) => {
   const { createNode, createParentChildLink } = actions
@@ -89,7 +93,6 @@ exports.onCreateNode = async (
           cache,
           createNode,
           createNodeId,
-          createContentDigest,
         })
         .on(`finish`, r => {
           resolve(r)
@@ -115,45 +118,32 @@ const createScreenshotNode = async ({
   cache,
   createNode,
   createNodeId,
-  createContentDigest,
 }) => {
   try {
-    let fileNode, expires
-    if (USE_PLACEHOLDER_IMAGE) {
-      const getPlaceholderFileNode = require(`./placeholder-file-node`)
-      fileNode = await getPlaceholderFileNode({
-        createNode,
-        createNodeId,
-      })
-      expires = new Date(2999, 1, 1).getTime()
-    } else {
-      const screenshotResponse = await axios.post(SCREENSHOT_ENDPOINT, { url })
+    const screenshotResponse = await axios.post(SCREENSHOT_ENDPOINT, { url })
 
-      fileNode = await createRemoteFileNode({
-        url: screenshotResponse.data.url,
-        store,
-        cache,
-        createNode,
-        createNodeId,
-      })
-      expires = screenshotResponse.data.expires
+    const fileNode = await createRemoteFileNode({
+      url: screenshotResponse.data.url,
+      store,
+      cache,
+      createNode,
+      createNodeId,
+    })
 
-      if (!fileNode) {
-        throw new Error(`Remote file node is null`, screenshotResponse.data.url)
-      }
+    if (!fileNode) {
+      throw new Error(`Remote file node is null`, screenshotResponse.data.url)
     }
 
     const screenshotNode = {
       id: createNodeId(`${parent} >>> Screenshot`),
       url,
-      expires,
+      expires: screenshotResponse.data.expires,
       parent,
       children: [],
       internal: {
         type: `Screenshot`,
       },
       screenshotFile___NODE: fileNode.id,
-      usingPlaceholder: USE_PLACEHOLDER_IMAGE,
     }
 
     screenshotNode.internal.contentDigest = createContentDigest(screenshotNode)

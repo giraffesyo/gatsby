@@ -10,19 +10,6 @@ const digest = str =>
 const propsId = (parentId, name) => `${parentId}--ComponentProp-${name}`
 const descId = parentId => `${parentId}--ComponentDescription`
 
-function canParse(node) {
-  return (
-    node &&
-    (node.internal.mediaType === `application/javascript` ||
-      // Typescript doesn't really have a mime type and .ts files are a media file :/
-      node.internal.mediaType === `application/typescript` ||
-      node.internal.mediaType === `text/jsx` ||
-      node.internal.mediaType === `text/tsx` ||
-      node.extension === `tsx` ||
-      node.extension === `ts`)
-  )
-}
-
 function createDescriptionNode(node, entry, actions, createNodeId) {
   if (!entry.description) return node
   const { createNode } = actions
@@ -82,7 +69,11 @@ export default async function onCreateNode(
 ) {
   const { createNode, createParentChildLink } = actions
 
-  if (!canParse(node)) return
+  if (
+    node.internal.mediaType !== `application/javascript` &&
+    node.internal.mediaType !== `text/jsx`
+  )
+    return
 
   const content = await loadNodeContent(node)
 

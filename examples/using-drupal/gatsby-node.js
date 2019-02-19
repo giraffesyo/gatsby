@@ -18,37 +18,41 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
 exports.createPages = ({ actions, graphql }) => {
   const { createPage } = actions
 
-  const recipeTemplate = path.resolve(`src/templates/recipe.js`)
-  // Query for recipe nodes to use in creating pages.
-  return graphql(
-    `
-      {
-        allRecipes {
-          edges {
-            node {
-              internalId
-              fields {
-                slug
+  return new Promise((resolve, reject) => {
+    const recipeTemplate = path.resolve(`src/templates/recipe.js`)
+    // Query for recipe nodes to use in creating pages.
+    resolve(
+      graphql(
+        `
+          {
+            allRecipes {
+              edges {
+                node {
+                  internalId
+                  fields {
+                    slug
+                  }
+                }
               }
             }
           }
+        `
+      ).then(result => {
+        if (result.errors) {
+          reject(result.errors)
         }
-      }
-    `
-  ).then(result => {
-    if (result.errors) {
-      throw result.errors
-    }
 
-    // Create pages for each recipe.
-    result.data.allRecipes.edges.forEach(({ node }) => {
-      createPage({
-        path: node.fields.slug,
-        component: recipeTemplate,
-        context: {
-          slug: node.fields.slug,
-        },
+        // Create pages for each recipe.
+        result.data.allRecipes.edges.forEach(({ node }) => {
+          createPage({
+            path: node.fields.slug,
+            component: recipeTemplate,
+            context: {
+              slug: node.fields.slug,
+            },
+          })
+        })
       })
-    })
+    )
   })
 }

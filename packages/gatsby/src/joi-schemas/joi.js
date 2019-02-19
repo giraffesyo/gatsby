@@ -1,7 +1,6 @@
 const Joi = require(`joi`)
 
 export const gatsbyConfigSchema = Joi.object().keys({
-  __experimentalThemes: Joi.array(),
   polyfill: Joi.boolean(),
   siteMetadata: Joi.object(),
   pathPrefix: Joi.string(),
@@ -22,7 +21,7 @@ export const pageSchema = Joi.object()
     componentChunkName: Joi.string().required(),
     context: Joi.object(),
     pluginCreator___NODE: Joi.string(),
-    pluginCreatorId: Joi.string(),
+    pluginCreatorName: Joi.string(),
   })
   .unknown()
 
@@ -38,7 +37,7 @@ export const nodeSchema = Joi.object()
         mediaType: Joi.string(),
         type: Joi.string().required(),
         owner: Joi.string().required(),
-        fieldOwners: Joi.object(),
+        fieldOwners: Joi.array(),
         content: Joi.string().allow(``),
         description: Joi.string(),
         ignoreType: Joi.boolean(),

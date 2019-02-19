@@ -228,7 +228,7 @@ const writeHeadersFile = ({ publicFolder }) => contents =>
 export default function buildHeadersProgram(pluginData, pluginOptions) {
   return _.flow(
     validateUserOptions(pluginOptions),
-    mapUserLinkHeaders(pluginData),
+    mapUserLinkHeaders(pluginData, pluginOptions),
     applySecurityHeaders(pluginOptions),
     applyCachingHeaders(pluginOptions),
     mapUserLinkAllPageHeaders(pluginData, pluginOptions),

@@ -25,6 +25,8 @@ class ScrollContext extends React.Component {
       getCurrentLocation: () => this.props.location,
       shouldUpdateScroll: this.shouldUpdateScroll,
     })
+
+    this.scrollBehavior.updateScroll(null, this.getRouterProps())
   }
 
   getChildContext() {
