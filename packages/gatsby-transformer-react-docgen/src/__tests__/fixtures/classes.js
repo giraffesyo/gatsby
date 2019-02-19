@@ -17,8 +17,6 @@ Baz.Foo = () => <div />
  * Description!
  *
  * @alias {MyComponent}
- * @property {Foo} foo
- * @property {Bar} bar
  */
 class Bar extends React.Component {
   static propTypes = {

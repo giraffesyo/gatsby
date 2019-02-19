@@ -6,13 +6,9 @@
 /* FONT PATH
  * -------------------------- */
 @font-face {
-  font-family: "FontAwesome";
-  src: url("./fontawesome-webfont.eot?v=4.5.0");
-  src: url("./fontawesome-webfont.eot?#iefix&v=4.5.0")
-      format("embedded-opentype"),
-    url("./fontawesome-webfont.woff2?v=4.5.0") format("woff2"),
-    url("./fontawesome-webfont.woff?v=4.5.0") format("woff"),
-    url("./fontawesome-webfont.ttf?v=4.5.0") format("truetype");
+  font-family: 'FontAwesome';
+  src: url('./fontawesome-webfont.eot?v=4.5.0');
+  src: url('./fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('./fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('./fontawesome-webfont.woff?v=4.5.0') format('woff'), url('./fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('./fontawesome-webfont.svg?v=4.5.0') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -77,9 +73,9 @@
 }
 
 .fa-border {
-  padding: 0.2em 0.25em 0.15em;
+  padding: .2em .25em .15em;
   border: solid 0.08em #eeeeee;
-  border-radius: 0.1em;
+  border-radius: .1em;
 }
 
 .fa-pull-left {
@@ -91,11 +87,11 @@
 }
 
 .fa.fa-pull-left {
-  margin-right: 0.3em;
+  margin-right: .3em;
 }
 
 .fa.fa-pull-right {
-  margin-left: 0.3em;
+  margin-left: .3em;
 }
 
 /* Deprecated as of 4.4.0 */
@@ -108,11 +104,11 @@
 }
 
 .fa.pull-left {
-  margin-right: 0.3em;
+  margin-right: .3em;
 }
 
 .fa.pull-right {
-  margin-left: 0.3em;
+  margin-left: .3em;
 }
 
 .fa-spin {
@@ -135,6 +131,7 @@
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
   }
+
 }
 
 @keyframes fa-spin {
@@ -147,6 +144,7 @@
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
   }
+
 }
 
 .fa-rotate-90 {

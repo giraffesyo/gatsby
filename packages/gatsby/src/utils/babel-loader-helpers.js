@@ -2,11 +2,7 @@ const path = require(`path`)
 const _ = require(`lodash`)
 
 const loadCachedConfig = () => {
-  let pluginBabelConfig = {
-    stages: {
-      test: { plugins: [], presets: [] },
-    },
-  }
+  let pluginBabelConfig = { test: { plugins: [], presets: [] } }
   if (process.env.NODE_ENV !== `test`) {
     pluginBabelConfig = require(path.join(
       process.cwd(),
@@ -19,7 +15,7 @@ const loadCachedConfig = () => {
 const getCustomOptions = () => {
   const pluginBabelConfig = loadCachedConfig()
   const stage = process.env.GATSBY_BUILD_STAGE || `test`
-  return pluginBabelConfig.stages[stage].options
+  return pluginBabelConfig[stage].options
 }
 
 const prepareOptions = (babel, resolve = require.resolve) => {
@@ -52,25 +48,106 @@ const prepareOptions = (babel, resolve = require.resolve) => {
     )
   }
 
-  // Fallback preset
+  // Fallback presets/plugins
   const fallbackPresets = []
+  const fallbackPlugins = []
+
+  let targets
+  if (stage === `build-html`) {
+    targets = {
+      node: `current`,
+    }
+  } else {
+    targets = {
+      browsers: pluginBabelConfig.browserslist,
+    }
+  }
 
   fallbackPresets.push(
-    babel.createConfigItem([resolve(`babel-preset-gatsby`)], {
-      type: `preset`,
+    babel.createConfigItem(
+      [
+        resolve(`@babel/preset-env`),
+        {
+          loose: true,
+          modules: false,
+          useBuiltIns: `usage`,
+          targets,
+        },
+      ],
+      {
+        type: `preset`,
+      }
+    )
+  )
+
+  fallbackPresets.push(
+    babel.createConfigItem(
+      [
+        resolve(`@babel/preset-react`),
+        {
+          useBuiltIns: true,
+          pragma: `React.createElement`,
+          development: stage === `develop`,
+        },
+      ],
+      {
+        type: `preset`,
+      }
+    )
+  )
+
+  fallbackPlugins.push(
+    babel.createConfigItem(
+      [
+        resolve(`@babel/plugin-proposal-class-properties`),
+        {
+          loose: true,
+        },
+      ],
+      {
+        type: `plugin`,
+      }
+    )
+  )
+
+  fallbackPlugins.push(
+    babel.createConfigItem([resolve(`babel-plugin-macros`)], {
+      type: `plugin`,
     })
   )
+
+  fallbackPlugins.push(
+    babel.createConfigItem([resolve(`@babel/plugin-syntax-dynamic-import`)], {
+      type: `plugin`,
+    })
+  )
+
+  fallbackPlugins.push(
+    babel.createConfigItem(
+      [
+        resolve(`@babel/plugin-transform-runtime`),
+        {
+          helpers: true,
+          regenerator: true,
+        },
+      ],
+      {
+        type: `plugin`,
+      }
+    )
+  )
+
   // Go through babel state and create config items for presets/plugins from.
   const reduxPlugins = []
   const reduxPresets = []
-  pluginBabelConfig.stages[stage].plugins.forEach(plugin => {
+  pluginBabelConfig[stage].plugins.forEach(plugin => {
     reduxPlugins.push(
       babel.createConfigItem([resolve(plugin.name), plugin.options], {
         type: `plugin`,
       })
     )
   })
-  pluginBabelConfig.stages[stage].presets.forEach(preset => {
+  pluginBabelConfig[stage].presets.forEach(preset => {
     reduxPresets.push(
       babel.createConfigItem([resolve(preset.name), preset.options], {
         type: `preset`,
@@ -83,6 +160,7 @@ const prepareOptions = (babel, resolve = require.resolve) => {
     reduxPlugins,
     requiredPresets,
     requiredPlugins,
+    fallbackPlugins,
     fallbackPresets,
   ]
 }

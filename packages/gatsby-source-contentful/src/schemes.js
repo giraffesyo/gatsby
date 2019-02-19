@@ -52,7 +52,6 @@ const ImageCropFocusType = new GraphQLEnumType({
     RIGHT: { value: `right` },
     LEFT: { value: `left` },
     FACES: { value: `faces` },
-    CENTER: { value: `center` },
   },
 })
 

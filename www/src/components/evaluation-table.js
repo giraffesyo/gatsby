@@ -28,7 +28,6 @@ class EvaluationTable extends Component {
               background: colors.ui.bright,
             },
           }}
-          key={`info-icon-${words[words.length - 1]}`}
         >
           {` `}
           {`${words[words.length - 1]} `}
@@ -44,7 +43,7 @@ class EvaluationTable extends Component {
         </span>,
       ]
     }
-    const headers = [`Feature`, `Gatsby`, `Jekyll`, `WordPress`, `Squarespace`]
+    const headers = [`Feature`, `Gatsby`, `Jekyll`, `Wordpress`, `Squarespace`]
     const renderCell = (text, column) => {
       switch (column) {
         case 0: {
@@ -115,11 +114,8 @@ class EvaluationTable extends Component {
           {flatten(
             sections.map((section, s) =>
               [
-                <SectionTitle
-                  text={sectionHeaders[s]}
-                  key={`section-title-${s}`}
-                />,
-                <SectionHeaderTop key={`section-header-${s}`} />,
+                <SectionTitle text={sectionHeaders[s]} />,
+                <SectionHeaderTop />,
               ].concat(
                 flatten(
                   section.map((row, i) =>
@@ -127,9 +123,8 @@ class EvaluationTable extends Component {
                       <SectionHeaderBottom
                         display={row.node.Subcategory}
                         category={row.node.Subcategory}
-                        key={`section-header-bottom-${i}`}
                       />,
-                      <tr key={`first-row-${i}`}>
+                      <tr>
                         {headers.map((header, j) => (
                           <td
                             key={j}
@@ -170,7 +165,6 @@ class EvaluationTable extends Component {
                         style={{
                           display: showTooltip(s, i) ? `table-row` : `none`,
                         }}
-                        key={`second-row-${i}`}
                       >
                         <td
                           css={{

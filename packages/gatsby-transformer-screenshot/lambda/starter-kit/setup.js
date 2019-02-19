@@ -8,10 +8,7 @@ const config = require(`./config`)
 exports.getBrowser = (() => {
   let browser
   return async () => {
-    if (
-      typeof browser === `undefined` ||
-      !(await isBrowserAvailable(browser))
-    ) {
+    if (typeof browser === `undefined` || !await isBrowserAvailable(browser)) {
       await setupChrome()
       browser = await puppeteer.launch({
         headless: true,
@@ -38,7 +35,7 @@ const isBrowserAvailable = async browser => {
 }
 
 const setupChrome = async () => {
-  if (!(await existsExecutableChrome())) {
+  if (!await existsExecutableChrome()) {
     if (await existsLocalChrome()) {
       debugLog(`setup local chrome`)
       await setupLocalChrome()
@@ -66,7 +63,8 @@ const existsExecutableChrome = () =>
 
 const setupLocalChrome = () =>
   new Promise((resolve, reject) => {
-    fs.createReadStream(config.localChromePath)
+    fs
+      .createReadStream(config.localChromePath)
       .on(`error`, err => reject(err))
       .pipe(
         tar.x({
@@ -83,7 +81,8 @@ const setupS3Chrome = () =>
       Bucket: config.remoteChromeS3Bucket,
       Key: config.remoteChromeS3Key,
     }
-    s3.getObject(params)
+    s3
+      .getObject(params)
       .createReadStream()
       .on(`error`, err => reject(err))
       .pipe(

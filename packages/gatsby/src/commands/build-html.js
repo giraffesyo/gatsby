@@ -53,12 +53,7 @@ module.exports = async (program: any, activity: any) => {
           return resolve(null, stats)
         })
         .catch(e => {
-          const prettyError = createErrorFromString(
-            e.stack,
-            `${outputFile}.map`
-          )
-          prettyError.context = e.context
-          reject(prettyError)
+          reject(createErrorFromString(e.stack, `${outputFile}.map`))
         })
     })
   })

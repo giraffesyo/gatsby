@@ -8,10 +8,8 @@ exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {
   ) : (
     <GoogleFont key={`GoogleFont`} typography={typography} />
   )
-  if (process.env.BUILD_STAGE === `build-html`) {
-    setHeadComponents([
-      <TypographyStyle key={`TypographyStyle`} typography={typography} />,
-      ...googleFont,
-    ])
-  }
+  setHeadComponents([
+    <TypographyStyle key={`TypographyStyle`} typography={typography} />,
+    ...googleFont,
+  ])
 }

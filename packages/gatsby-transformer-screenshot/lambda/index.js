@@ -26,11 +26,9 @@ exports.handler = async (event, context, callback) => {
   const width = request.width || 1024
   const height = request.height || 768
 
-  const fullPage = request.fullPage || false
-
   const browser = await setup.getBrowser()
   exports
-    .run(browser, url, width, height, fullPage)
+    .run(browser, url, width, height)
     .then(result => {
       callback(null, proxyResponse(result))
     })
@@ -39,13 +37,13 @@ exports.handler = async (event, context, callback) => {
     })
 }
 
-exports.run = async (browser, url, width, height, fullPage) => {
+exports.run = async (browser, url, width, height) => {
   console.log(`Invoked: ${url} (${width}x${height})`)
 
   if (!process.env.S3_BUCKET) {
     throw new Error(
       `Provide the S3 bucket to use by adding an S3_BUCKET` +
-      ` environment variable to this Lambda's configuration`
+        ` environment variable to this Lambda's configuration`
     )
   }
 
@@ -64,7 +62,7 @@ exports.run = async (browser, url, width, height, fullPage) => {
 
   const screenshotUrl = `https://s3-${region}.amazonaws.com/${
     process.env.S3_BUCKET
-    }/${key}`
+  }/${key}`
 
   const metadata = await s3HeadObject(key)
 
@@ -88,9 +86,9 @@ exports.run = async (browser, url, width, height, fullPage) => {
   await page.setViewport({ width, height, deviceScaleFactor: 2 })
   await page.goto(url, { waitUntil: [`load`, `networkidle0`] })
   // wait for full-size images to fade in
-  await page.waitFor(1000)
+  await page.waitFor(1000);
 
-  const screenshot = await page.screenshot({ fullPage })
+  const screenshot = await page.screenshot()
   const up = await s3PutObject(key, screenshot)
 
   await page.close()

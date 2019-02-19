@@ -28,10 +28,6 @@ export function renderHTML({ htmlComponentRendererPath, paths, envVars }) {
             resolve(fs.outputFile(generatePathToOutput(path), htmlString))
           })
         } catch (e) {
-          // add some context to error so we can display more helpful message
-          e.context = {
-            path,
-          }
           reject(e)
         }
       })

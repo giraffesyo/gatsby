@@ -4,25 +4,16 @@ Parses JavaScript files to extract frontmatter from exports.
 
 ## Install
 
-`npm install --save gatsby-source-filesystem gatsby-transformer-javascript-frontmatter`
+`npm install --save gatsby-transformer-javascript-frontmatter`
 
 ## How to use
 
-To use this plugin you also need [gatsby-source-filesystem](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-source-filesystem) installed and configured.
+To use this plugin you also need [gatsby-source-filesystem](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-source-filesystem) installed.
 
 ```javascript
 // In your gatsby-config.js
 module.exports = {
-  plugins: [
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `pages`,
-        path: `${__dirname}/src/pages/`,
-      },
-    },
-    "gatsby-transformer-javascript-frontmatter",
-  ],
+  plugins: [`gatsby-transformer-javascript-frontmatter`],
 }
 ```
 
@@ -31,7 +22,7 @@ module.exports = {
 This plugin uses [@babel/parser](https://www.npmjs.com/package/@babel/parser) and [@babel/traverse](https://www.npmjs.com/package/@babel/traverse) to
 statically read the frontmatter exports.
 
-In a `.js` (or `.jsx` / `.ts` / `.tsx`) file, export a frontmatter object to set your metadata variables, like so:
+In a `.js` file, export a frontmatter object to set your metadata variables, like so:
 
 ```javascript
 import React from "react"

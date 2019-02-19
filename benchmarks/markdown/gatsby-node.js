@@ -1,5 +1,8 @@
-const NUM_PAGES = parseInt(process.env.NUM_PAGES || 5000, 10)
-const template = require(`./page-template`)
+let NUM_PAGES = 5000
+
+if (process.env.NUM_PAGES) {
+  NUM_PAGES = process.env.NUM_PAGES
+}
 
 exports.sourceNodes = ({ actions: { createNode } }) => {
   // Create markdown nodes
@@ -12,7 +15,7 @@ exports.sourceNodes = ({ actions: { createNode } }) => {
       internal: {
         type: `FakeMarkdown`,
         mediaType: `text/markdown`,
-        content: template(step),
+        content: `---\ntitle: "hi"\n---\nWhat up folks? This is _lit_\n\n##Page #${step}`,
         contentDigest: step.toString(),
       },
     })
@@ -26,7 +29,7 @@ exports.createPages = ({ actions: { createPage } }) => {
       path: `/path/${step}/`,
       component: require.resolve(`./src/templates/blank.js`),
       context: {
-        id: step.toString(),
+        id: step,
       },
     })
   }

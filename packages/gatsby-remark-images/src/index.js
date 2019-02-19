@@ -1,12 +1,6 @@
-const {
-  imageClass,
-  imageBackgroundClass,
-  imageWrapperClass,
-} = require(`./constants`)
+// const select = require(`unist-util-select`)
 const visitWithParents = require(`unist-util-visit-parents`)
-const getDefinitions = require(`mdast-util-definitions`)
 const path = require(`path`)
-const queryString = require(`query-string`)
 const isRelativeUrl = require(`is-relative-url`)
 const _ = require(`lodash`)
 const { fluid } = require(`gatsby-plugin-sharp`)
@@ -21,7 +15,7 @@ const slash = require(`slash`)
 // 4. Create the responsive images.
 // 5. Set the html w/ aspect ratio helper.
 module.exports = (
-  { files, markdownNode, markdownAST, pathPrefix, getNode, reporter, cache },
+  { files, markdownNode, markdownAST, pathPrefix, getNode, reporter },
   pluginOptions
 ) => {
   const defaults = {
@@ -43,9 +37,6 @@ module.exports = (
         node.type === `link`
     )
 
-  // Get all the available definitions in the markdown tree
-  const definitions = getDefinitions(markdownAST)
-
   // This will allow the use of html image tags
   // const rawHtmlNodes = select(markdownAST, `html`)
   let rawHtmlNodes = []
@@ -58,42 +49,21 @@ module.exports = (
   // This will only work for markdown syntax image tags
   let markdownImageNodes = []
 
-  visitWithParents(
-    markdownAST,
-    [`image`, `imageReference`],
-    (node, ancestors) => {
-      const inLink = ancestors.some(findParentLinks)
+  visitWithParents(markdownAST, `image`, (node, ancestors) => {
+    const inLink = ancestors.some(findParentLinks)
 
-      markdownImageNodes.push({ node, inLink })
-    }
-  )
-
-  const getImageInfo = uri => {
-    const { url, query } = queryString.parseUrl(uri)
-    return {
-      ext: path
-        .extname(url)
-        .split(`.`)
-        .pop(),
-      url,
-      query,
-    }
-  }
+    markdownImageNodes.push({ node, inLink })
+  })
 
   // Takes a node and generates the needed images and then returns
   // the needed HTML replacement for the image
-  const generateImagesAndUpdateNode = async function(
-    node,
-    resolve,
-    inLink,
-    overWrites = {}
-  ) {
+  const generateImagesAndUpdateNode = async function(node, resolve, inLink) {
     // Check if this markdownNode has a File parent. This plugin
     // won't work if the image isn't hosted locally.
     const parentNode = getNode(markdownNode.parent)
     let imagePath
     if (parentNode && parentNode.dir) {
-      imagePath = slash(path.join(parentNode.dir, getImageInfo(node.url).url))
+      imagePath = slash(path.join(parentNode.dir, node.url))
     } else {
       return null
     }
@@ -113,12 +83,14 @@ module.exports = (
       file: imageNode,
       args: options,
       reporter,
-      cache,
     })
 
     if (!fluidResult) {
       return resolve()
     }
+
+    // Calculate the paddingBottom %
+    const ratio = `${(1 / fluidResult.aspectRatio) * 100}%`
 
     const originalImg = fluidResult.originalImg
     const fallbackSrc = fluidResult.src
@@ -126,44 +98,32 @@ module.exports = (
     const presentationWidth = fluidResult.presentationWidth
 
     // Generate default alt tag
-    const srcSplit = getImageInfo(node.url).url.split(`/`)
+    const srcSplit = node.url.split(`/`)
     const fileName = srcSplit[srcSplit.length - 1]
     const fileNameNoExt = fileName.replace(/\.[^/.]+$/, ``)
     const defaultAlt = fileNameNoExt.replace(/[^A-Z0-9]/gi, ` `)
 
-    const alt = overWrites.alt
-      ? overWrites.alt
-      : node.alt
-      ? node.alt
-      : defaultAlt
+    // TODO
+    // Fade in images on load.
+    // https://www.perpetual-beta.org/weblog/silky-smooth-image-loading.html
 
-    const title = node.title ? node.title : ``
-
-    const imageStyle = `
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      vertical-align: middle;
-      position: absolute;
-      top: 0;
-      left: 0;
-      box-shadow: inset 0px 0px 0px 400px ${options.backgroundColor};`.replace(
-      /\s*(\S+:)\s*/g,
-      `$1`
-    )
+    const imageClass = `gatsby-resp-image-image`
+    const imageStyle = `width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px ${
+      options.backgroundColor
+    };`
 
     // Create our base image tag
     let imageTag = `
       <img
         class="${imageClass}"
         style="${imageStyle}"
-        alt="${alt}"
-        title="${title}"
+        alt="${node.alt ? node.alt : defaultAlt}"
+        title="${node.title ? node.title : ``}"
         src="${fallbackSrc}"
         srcset="${srcSet}"
         sizes="${fluidResult.sizes}"
       />
-    `.trim()
+    `
 
     // if options.withWebp is enabled, generate a webp version and change the image tag to a picture tag
     if (options.withWebp) {
@@ -199,33 +159,31 @@ module.exports = (
           class="${imageClass}"
           style="${imageStyle}"
           src="${fallbackSrc}"
-          alt="${alt}"
-          title="${title}"
+          alt="${node.alt ? node.alt : defaultAlt}"
+          title="${node.title ? node.title : ``}"
+          src="${fallbackSrc}"
         />
       </picture>
-      `.trim()
+      `
     }
-
-    const ratio = `${(1 / fluidResult.aspectRatio) * 100}%`
 
     // Construct new image node w/ aspect ratio placeholder
     const showCaptions = options.showCaptions && node.title
     let rawHTML = `
   <span
-    class="${imageWrapperClass}"
+    class="gatsby-resp-image-wrapper"
     style="position: relative; display: block; ${
-      showCaptions ? `` : options.wrapperStyle
-    } max-width: ${presentationWidth}px; margin-left: auto; margin-right: auto;"
+      showCaptions ? null : options.wrapperStyle
+    }; max-width: ${presentationWidth}px; margin-left: auto; margin-right: auto;"
   >
     <span
-      class="${imageBackgroundClass}"
+      class="gatsby-resp-image-background-image"
       style="padding-bottom: ${ratio}; position: relative; bottom: 0; left: 0; background-image: url('${
       fluidResult.base64
     }'); background-size: cover; display: block;"
-    ></span>
-    ${imageTag}
+    >${imageTag}</span>
   </span>
-  `.trim()
+  `
 
     // Make linking to original image optional.
     if (!inLink && options.linkImagesToOriginal) {
@@ -237,19 +195,19 @@ module.exports = (
     target="_blank"
     rel="noopener"
   >
-    ${rawHTML}
+  ${rawHTML}
   </a>
-    `.trim()
+    `
     }
 
     // Wrap in figure and use title as caption
     if (showCaptions) {
       rawHTML = `
   <figure class="gatsby-resp-image-figure" style="${options.wrapperStyle}">
-    ${rawHTML}
-    <figcaption class="gatsby-resp-image-figcaption">${node.title}</figcaption>
+  ${rawHTML}
+  <figcaption class="gatsby-resp-image-figcaption">${node.title}</figcaption>
   </figure>
-      `.trim()
+      `
     }
 
     return rawHTML
@@ -260,24 +218,7 @@ module.exports = (
     markdownImageNodes.map(
       ({ node, inLink }) =>
         new Promise(async (resolve, reject) => {
-          const overWrites = {}
-          let refNode
-          if (
-            !node.hasOwnProperty(`url`) &&
-            node.hasOwnProperty(`identifier`)
-          ) {
-            //consider as imageReference node
-            refNode = node
-            node = definitions(refNode.identifier)
-            // pass original alt from referencing node
-            overWrites.alt = refNode.alt
-            if (!node) {
-              // no definition found for image reference,
-              // so there's nothing for us to do.
-              return resolve()
-            }
-          }
-          const fileType = getImageInfo(node.url).ext
+          const fileType = node.url.slice(-3)
 
           // Ignore gifs as we can't process them,
           // svgs as they are already responsive by definition
@@ -289,15 +230,11 @@ module.exports = (
             const rawHTML = await generateImagesAndUpdateNode(
               node,
               resolve,
-              inLink,
-              overWrites
+              inLink
             )
 
             if (rawHTML) {
-              // Replace the image or ref node with an inline HTML node.
-              if (refNode) {
-                node = refNode
-              }
+              // Replace the image node with an inline HTML node.
               node.type = `html`
               node.value = rawHTML
             }
@@ -341,7 +278,7 @@ module.exports = (
                 return resolve()
               }
 
-              const fileType = getImageInfo(formattedImgTag.url).ext
+              const fileType = formattedImgTag.url.slice(-3)
 
               // Ignore gifs as we can't process them,
               // svgs as they are already responsive by definition

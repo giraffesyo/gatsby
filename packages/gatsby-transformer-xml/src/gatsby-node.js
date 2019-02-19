@@ -1,13 +1,8 @@
 const parseXml = require(`xml-parser`)
+const crypto = require(`crypto`)
 const _ = require(`lodash`)
 
-async function onCreateNode({
-  node,
-  actions,
-  loadNodeContent,
-  createNodeId,
-  createContentDigest,
-}) {
+async function onCreateNode({ node, actions, loadNodeContent, createNodeId }) {
   const { createNode, createParentChildLink } = actions
 
   // We only care about XML content.
@@ -17,6 +12,11 @@ async function onCreateNode({
   const rawXml = await loadNodeContent(node)
   const parsedXml = parseXml(rawXml)
   const nodeArray = parsedXml.root.children.map((obj, i) => {
+    const objStr = JSON.stringify(obj)
+    const contentDigest = crypto
+      .createHash(`md5`)
+      .update(objStr)
+      .digest(`hex`)
     if (obj.children) {
       obj.xmlChildren = obj.children
       delete obj.children
@@ -29,7 +29,7 @@ async function onCreateNode({
       parent: node.id,
       children: [],
       internal: {
-        contentDigest: createContentDigest(obj),
+        contentDigest,
         type: _.upperFirst(_.camelCase(`${node.name} xml`)),
       },
     }

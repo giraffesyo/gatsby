@@ -12,19 +12,11 @@ jest.mock(`axios`, () => {
   }
 })
 
-jest.mock(`gatsby-source-filesystem`, () => {
-  return {
-    createRemoteFileNode: jest.fn(),
-  }
-})
-const { createRemoteFileNode } = require(`gatsby-source-filesystem`)
-
 const { sourceNodes } = require(`../gatsby-node`)
 
 describe(`gatsby-source-drupal`, () => {
   const nodes = {}
   const createNodeId = id => `generated-id-${id}`
-  const baseUrl = `http://fixture`
 
   beforeAll(async () => {
     const args = {
@@ -34,13 +26,12 @@ describe(`gatsby-source-drupal`, () => {
       },
     }
 
-    await sourceNodes(args, { baseUrl })
+    await sourceNodes(args, { baseUrl: `http://fixture` })
   })
 
   it(`Generates nodes`, () => {
     expect(Object.keys(nodes).length).not.toEqual(0)
     expect(nodes[createNodeId(`file-1`)]).toBeDefined()
-    expect(nodes[createNodeId(`file-2`)]).toBeDefined()
     expect(nodes[createNodeId(`tag-1`)]).toBeDefined()
     expect(nodes[createNodeId(`tag-2`)]).toBeDefined()
     expect(nodes[createNodeId(`article-1`)]).toBeDefined()
@@ -106,18 +97,5 @@ describe(`gatsby-source-drupal`, () => {
     ).toEqual(expect.arrayContaining([createNodeId(`article-1`)]))
   })
 
-  it(`Download files`, () => {
-    const urls = [
-      `/sites/default/files/main-image.png`,
-      `/sites/default/files/secondary-image.png`,
-    ].map(fileUrl => new URL(fileUrl, baseUrl).href)
-
-    urls.forEach(url => {
-      expect(createRemoteFileNode).toBeCalledWith(
-        expect.objectContaining({
-          url,
-        })
-      )
-    })
-  })
+  // TO-DO: add tests for fetching files
 })

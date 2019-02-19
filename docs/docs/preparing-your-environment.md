@@ -1,6 +1,5 @@
 ---
 title: Preparing your environment
-overview: true
 ---
 
 To get started with Gatsby, you'll need to make sure you have the following software tools installed:
@@ -10,5 +9,3 @@ To get started with Gatsby, you'll need to make sure you have the following soft
 3.  [Gatsby CLI](/tutorial/part-zero/#install-the-gatsby-cli)
 
 For step-by-step installation instructions and detailed explanations of the required software, head on over to the [Gatsby tutorial](/tutorial/part-zero/).
-
-[[guidelist]]

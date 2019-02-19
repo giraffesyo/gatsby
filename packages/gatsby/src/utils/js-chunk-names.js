@@ -1,4 +1,4 @@
-const { kebabCase } = require(`lodash`)
+import _ from "lodash"
 const path = require(`path`)
 const kebabHash = require(`kebab-hash`)
 const { store } = require(`../redux`)
@@ -15,7 +15,7 @@ const generateComponentChunkName = componentPath => {
     directory = program.directory
   }
   const name = path.relative(directory, componentPath)
-  return `component---${kebabCase(name)}`
+  return `component---${_.kebabCase(name)}`
 }
 
 exports.generatePathChunkName = generatePathChunkName

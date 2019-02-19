@@ -3,7 +3,7 @@ const { onCreateNode } = require(`../gatsby-node`)
 describe(`Process TOML nodes correctly`, () => {
   const node = {
     id: `whatever`,
-    parent: null,
+    parent: `SOURCE`,
     children: [],
     extension: `toml`,
     internal: {

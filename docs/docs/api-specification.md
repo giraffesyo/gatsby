@@ -9,10 +9,6 @@ The two top priorities of the API are a) enable a broad and robust plugin
 ecosystem and b) on top of that a broad and robust theme ecosystem (themes are
 on the back burner btw until after v1 comes out).
 
-## Prerequisites
-
-If you’re not familiar with Gatsby’s lifecycle, see the overview [Gatsby Lifecycle APIs](/docs/gatsby-lifecycle-apis/).
-
 ## Plugins
 
 Plugins can extend Gatsby in many ways:
@@ -29,7 +25,7 @@ Plugins can extend Gatsby in many ways:
   sitemap, RSS feed)
 
 A single plugin can use multiple APIs to accomplish its purpose. E.g. the plugin
-for the CSS-in-JS library [Glamor](/packages/gatsby-plugin-glamor/):
+for the css-in-js library [Glamor](/packages/gatsby-plugin-glamor/):
 
 1.  modifies the webpack config to add its plugin
 2.  adds a Babel plugin to replace React's default createElement
@@ -48,7 +44,7 @@ highlighting to code blocks.
 Transformer plugins are decoupled from source plugins. Transformer plugins look
 at the media type of new nodes created by source plugins to decide if they can
 transform it or not. Which means that a markdown transformer plugin can
-transform markdown from any source without any other configuration e.g. from a
+transform markdown from any source without any other configuration e.g. from
 file, a code comment, or external service like Trello which supports markdown
 in some of its data fields.
 
@@ -60,9 +56,9 @@ See
 ## Concepts
 
 - _Page_ — a site page with a pathname, a template component, and optional
-  GraphQL query.
+  graphql query.
 - _Page Component_ — React.js component that renders a page and can optionally
-  specify a GraphQL query
+  specify a graphql query
 - _Component extensions_ — extensions that are resolvable as components. `.js`
   and `.jsx` are supported by core. But plugins can add support for other
   compile-to-js languages.
@@ -101,7 +97,7 @@ fin
 Once the initial bootstrap is finished, we start `webpack-dev-server` and an express server for serving files for the development server, and for a production build, we start building the CSS then JavaScript then HTML with webpack.
 
 During these processes there are various extension points where plugins can
-intervene. All major processes have an `onPre` and `onPost` e.g. `onPreBootstrap`
+intervene. All major processes have a `onPre` and `onPost` e.g. `onPreBootstrap`
 and `onPostBootstrap` or `onPreBuild` or `onPostBuild`. During bootstrap,
 plugins can respond at various stages to APIs like `onCreatePages`,
 `onCreateBabelConfig`, and `onSourceNodes`.
@@ -109,7 +105,7 @@ plugins can respond at various stages to APIs like `onCreatePages`,
 At each extension point, Gatsby identifies the plugins which implement the API
 and calls them in serial following their order in the site's `gatsby-config.js`.
 
-In addition to extension APIs in a node, plugins can also implement extension APIs
+In addition to extension APIs in node, plugins can also implement extension APIs
 in the server rendering process and the browser e.g. `onClientEntry` or
 `onRouteUpdate`
 

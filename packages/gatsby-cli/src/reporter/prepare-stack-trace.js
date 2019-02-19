@@ -108,16 +108,20 @@ function CallSiteToString() {
   let isMethodCall =
     methodName && !((this.isToplevel && this.isToplevel()) || isConstructor)
   if (isMethodCall && functionName) {
-    if (typeName && functionName.indexOf(typeName) != 0) {
-      line += `${typeName}.`
-    }
-    line += functionName
-    if (
-      methodName &&
-      functionName.indexOf(`.` + methodName) !=
-        functionName.length - methodName.length - 1
-    ) {
-      line += ` [as ${methodName}]`
+    if (functionName) {
+      if (typeName && functionName.indexOf(typeName) != 0) {
+        line += `${typeName}.`
+      }
+      line += functionName
+      if (
+        methodName &&
+        functionName.indexOf(`.` + methodName) !=
+          functionName.length - methodName.length - 1
+      ) {
+        line += ` [as ${methodName}]`
+      }
+    } else {
+      line += typeName + `.` + (methodName || `<anonymous>`)
     }
   } else if (typeName && !functionName) {
     line += typeName + `.` + (methodName || `<anonymous>`)

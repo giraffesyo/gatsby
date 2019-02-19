@@ -1,3 +1,4 @@
+const crypto = require(`crypto`)
 const moment = require(`moment`)
 const chokidar = require(`chokidar`)
 const systemPath = require(`path`)
@@ -5,7 +6,7 @@ const _ = require(`lodash`)
 
 const { emitter } = require(`../../redux`)
 const { boundActionCreators } = require(`../../redux/actions`)
-const { getNode } = require(`../../db/nodes`)
+const { getNode } = require(`../../redux`)
 
 function transformPackageJson(json) {
   const transformDeps = deps =>
@@ -41,7 +42,7 @@ function transformPackageJson(json) {
 
 const createPageId = path => `SitePage ${path}`
 
-exports.sourceNodes = ({ createContentDigest, actions, store }) => {
+exports.sourceNodes = ({ actions, store }) => {
   const { createNode } = actions
   const state = store.getState()
   const { program } = state
@@ -53,11 +54,14 @@ exports.sourceNodes = ({ createContentDigest, actions, store }) => {
   createNode({
     ...page,
     id: createPageId(page.path),
-    parent: null,
+    parent: `SOURCE`,
     children: [],
     internal: {
       type: `SitePage`,
-      contentDigest: createContentDigest(page),
+      contentDigest: crypto
+        .createHash(`md5`)
+        .update(JSON.stringify(page))
+        .digest(`hex`),
     },
   })
 
@@ -68,10 +72,13 @@ exports.sourceNodes = ({ createContentDigest, actions, store }) => {
       packageJson: transformPackageJson(
         require(`${plugin.resolve}/package.json`)
       ),
-      parent: null,
+      parent: `SOURCE`,
       children: [],
       internal: {
-        contentDigest: createContentDigest(plugin),
+        contentDigest: crypto
+          .createHash(`md5`)
+          .update(JSON.stringify(plugin))
+          .digest(`hex`),
         type: `SitePlugin`,
       },
     })
@@ -98,10 +105,13 @@ exports.sourceNodes = ({ createContentDigest, actions, store }) => {
     createNode({
       ...node,
       id: `Site`,
-      parent: null,
+      parent: `SOURCE`,
       children: [],
       internal: {
-        contentDigest: createContentDigest(node),
+        contentDigest: crypto
+          .createHash(`md5`)
+          .update(JSON.stringify(node))
+          .digest(`hex`),
         type: `Site`,
       },
     })
@@ -129,7 +139,7 @@ exports.sourceNodes = ({ createContentDigest, actions, store }) => {
   })
 }
 
-exports.onCreatePage = ({ createContentDigest, page, actions }) => {
+exports.onCreatePage = ({ page, actions }) => {
   const { createNode } = actions
   // eslint-disable-next-line
   const { updatedAt, ...pageWithoutUpdated } = page
@@ -138,11 +148,14 @@ exports.onCreatePage = ({ createContentDigest, page, actions }) => {
   createNode({
     ...pageWithoutUpdated,
     id: createPageId(page.path),
-    parent: null,
+    parent: `SOURCE`,
     children: [],
     internal: {
       type: `SitePage`,
-      contentDigest: createContentDigest(pageWithoutUpdated),
+      contentDigest: crypto
+        .createHash(`md5`)
+        .update(JSON.stringify(pageWithoutUpdated))
+        .digest(`hex`),
       description:
         page.pluginCreatorId === `Plugin default-site-plugin`
           ? `Your site's "gatsby-node.js"`

@@ -206,69 +206,127 @@ module.exports = (
   visit(markdownAST, `html`, node => {
     const $ = cheerio.load(node.value)
 
-    function processUrl({ url }) {
+    // Handle Images
+    const imageRefs = []
+    $(`img`).each(function() {
       try {
-        const ext = url.split(`.`).pop()
+        if (isRelativeUrl($(this).attr(`src`))) {
+          imageRefs.push($(this))
+        }
+      } catch (err) {
+        // Ignore
+      }
+    })
+
+    for (let thisImg of imageRefs) {
+      try {
+        const ext = thisImg
+          .attr(`src`)
+          .split(`.`)
+          .pop()
         if (!options.ignoreFileExtensions.includes(ext)) {
-          // The link object will be modified to the new location so we'll
-          // use that data to update our ref
-          const link = { url }
-          visitor(link)
-          node.value = node.value.replace(new RegExp(url, `g`), link.url)
+          generateImagesAndUpdateNode(thisImg, node)
         }
       } catch (err) {
         // Ignore
       }
     }
 
-    // extracts all elements that have the provided url attribute
-    function extractUrlAttributeAndElement(selection, attribute) {
-      return (
-        selection
-          // extract the elements that have the attribute
-          .map(function() {
-            const element = $(this)
-            const url = $(this).attr(attribute)
-            if (url && isRelativeUrl(url)) {
-              return { url, element }
-            }
-            return undefined
-          })
-          // cheerio object -> array
-          .toArray()
-          // filter out empty or undefined values
-          .filter(Boolean)
-      )
+    // Handle video tags.
+    const videoRefs = []
+    $(`video source`).each(function() {
+      try {
+        if (isRelativeUrl($(this).attr(`src`))) {
+          videoRefs.push($(this))
+        }
+      } catch (err) {
+        // Ignore
+      }
+    })
+
+    for (let thisVideo of videoRefs) {
+      try {
+        const ext = thisVideo
+          .attr(`src`)
+          .split(`.`)
+          .pop()
+        if (!options.ignoreFileExtensions.includes(ext)) {
+          // The link object will be modified to the new location so we'll
+          // use that data to update our ref
+          const link = { url: thisVideo.attr(`src`) }
+          visitor(link)
+          node.value = node.value.replace(
+            new RegExp(thisVideo.attr(`src`), `g`),
+            link.url
+          )
+        }
+      } catch (err) {
+        // Ignore
+      }
     }
 
-    // Handle Images
-    extractUrlAttributeAndElement($(`img[src]`), `src`).forEach(
-      ({ url, element }) => {
-        try {
-          const ext = url.split(`.`).pop()
-          if (!options.ignoreFileExtensions.includes(ext)) {
-            generateImagesAndUpdateNode(element, node)
-          }
-        } catch (err) {
-          // Ignore
-        }
-      }
-    )
-
-    // Handle video tags.
-    extractUrlAttributeAndElement(
-      $(`video source[src], video[src]`),
-      `src`
-    ).forEach(processUrl)
-
     // Handle audio tags.
-    extractUrlAttributeAndElement(
-      $(`audio source[src], audio[src]`),
-      `src`
-    ).forEach(processUrl)
+    const audioRefs = []
+    $(`audio source`).each(function() {
+      try {
+        if (isRelativeUrl($(this).attr(`src`))) {
+          audioRefs.push($(this))
+        }
+      } catch (err) {
+        // Ignore
+      }
+    })
+
+    for (let thisAudio of audioRefs) {
+      try {
+        const ext = thisAudio
+          .attr(`src`)
+          .split(`.`)
+          .pop()
+        if (!options.ignoreFileExtensions.includes(ext)) {
+          const link = { url: thisAudio.attr(`src`) }
+          visitor(link)
+          node.value = node.value.replace(
+            new RegExp(thisAudio.attr(`src`), `g`),
+            link.url
+          )
+        }
+      } catch (err) {
+        // Ignore
+      }
+    }
 
     // Handle a tags.
-    extractUrlAttributeAndElement($(`a[href]`), `href`).forEach(processUrl)
+    const aRefs = []
+    $(`a`).each(function() {
+      try {
+        if (isRelativeUrl($(this).attr(`href`))) {
+          aRefs.push($(this))
+        }
+      } catch (err) {
+        // Ignore
+      }
+    })
+
+    for (let thisATag of aRefs) {
+      try {
+        const ext = thisATag
+          .attr(`href`)
+          .split(`.`)
+          .pop()
+        if (!options.ignoreFileExtensions.includes(ext)) {
+          const link = { url: thisATag.attr(`href`) }
+          visitor(link)
+
+          node.value = node.value.replace(
+            new RegExp(thisATag.attr(`href`), `g`),
+            link.url
+          )
+        }
+      } catch (err) {
+        // Ignore
+      }
+    }
 
     return
   })

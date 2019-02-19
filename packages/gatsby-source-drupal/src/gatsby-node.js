@@ -14,7 +14,7 @@ const createContentDigest = obj =>
 
 exports.sourceNodes = async (
   { actions, getNode, hasNodeChanged, store, cache, createNodeId },
-  { baseUrl, apiBase, basicAuth }
+  { baseUrl, apiBase }
 ) => {
   const { createNode } = actions
 
@@ -40,21 +40,16 @@ exports.sourceNodes = async (
   // .lastFetched
   // }
 
-  const data = await axios.get(`${baseUrl}/${apiBase}`, { auth: basicAuth })
+  const data = await axios.get(`${baseUrl}/${apiBase}`)
   const allData = await Promise.all(
     _.map(data.data.links, async (url, type) => {
       if (type === `self`) return
       if (!url) return
       if (!type) return
       const getNext = async (url, data = []) => {
-        if (typeof url === `object`) {
-          // url can be string or object containing href field
-          url = url.href
-        }
-
         let d
         try {
-          d = await axios.get(url, { auth: basicAuth })
+          d = await axios.get(url)
         } catch (error) {
           if (error.response && error.response.status == 405) {
             // The endpoint doesn't support the GET method, so just skip it.
@@ -187,28 +182,14 @@ exports.sourceNodes = async (
         node.internal.type === `file__file`
       ) {
         try {
-          let fileUrl = node.url
-          if (typeof node.uri === `object`) {
-            // Support JSON API 2.x file URI format https://www.drupal.org/node/2982209
-            fileUrl = node.uri.url
-          }
           // Resolve w/ baseUrl if node.uri isn't absolute.
-          const url = new URL(fileUrl, baseUrl)
-          // If we have basicAuth credentials, add them to the request.
-          const auth =
-            typeof basicAuth === `object`
-              ? {
-                  htaccess_user: basicAuth.username,
-                  htaccess_pass: basicAuth.password,
-                }
-              : {}
+          const url = new URL(node.url, baseUrl)
           fileNode = await createRemoteFileNode({
             url: url.href,
             store,
             cache,
             createNode,
             createNodeId,
-            auth,
           })
         } catch (e) {
           // Ignore

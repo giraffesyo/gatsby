@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { graphql } from "gatsby"
-import { Helmet } from "react-helmet"
+import Helmet from "react-helmet"
 
 import Layout from "../components/layout"
 import EvaluationTable from "../components/evaluation-table"
@@ -43,54 +43,31 @@ const LegendTable = () => {
   }
 
   const balls = [
-    <div css={legendBallCellStyle} key={`${legendBallCellStyle}-1`}>
+    <div css={legendBallCellStyle}>
       <h4 style={{ margin: 0 }}>Icon</h4>
     </div>,
-    <div css={legendBallCellStyle} key={`${legendBallCellStyle}-2`}>
+    <div css={legendBallCellStyle}>
       <EvaluationCell num="3" style={legendBallStyle} />
     </div>,
-    <div css={legendBallCellStyle} key={`${legendBallCellStyle}-3`}>
+    <div css={legendBallCellStyle}>
       <EvaluationCell num="2" style={legendBallStyle} />
     </div>,
-    <div css={legendBallCellStyle} key={`${legendBallCellStyle}-4`}>
+    <div css={legendBallCellStyle}>
       <EvaluationCell num="1" style={legendBallStyle} />
     </div>,
-    <div css={legendBallCellStyle} key={`${legendBallCellStyle}-5`}>
+    <div css={legendBallCellStyle}>
       <EvaluationCell num="0" style={legendBallStyle} />
     </div>,
   ]
 
   const legendText = [
-    <div
-      css={legendExplanationCellStyle}
-      key={`${legendExplanationCellStyle}-1`}
-    >
+    <div css={legendExplanationCellStyle}>
       <h5 style={{ margin: 0 }}>Feature Availability</h5>
     </div>,
-    <div
-      css={legendExplanationCellStyle}
-      key={`${legendExplanationCellStyle}-2`}
-    >
-      Out of the box
-    </div>,
-    <div
-      css={legendExplanationCellStyle}
-      key={`${legendExplanationCellStyle}-3`}
-    >
-      Plugins available
-    </div>,
-    <div
-      css={legendExplanationCellStyle}
-      key={`${legendExplanationCellStyle}-4`}
-    >
-      Needs customization
-    </div>,
-    <div
-      css={legendExplanationCellStyle}
-      key={`${legendExplanationCellStyle}-5`}
-    >
-      Not possible
-    </div>,
+    <div css={legendExplanationCellStyle}>Out of the box</div>,
+    <div css={legendExplanationCellStyle}>Plugins available</div>,
+    <div css={legendExplanationCellStyle}>Needs customization</div>,
+    <div css={legendExplanationCellStyle}>Not possible</div>,
   ]
 
   return (
@@ -135,12 +112,12 @@ const LegendTable = () => {
 }
 
 const FeaturesHeader = () => (
-  <section>
+  <div>
     <h1 id="introduction" style={{ marginTop: 0 }}>
       Features
     </h1>
     <FuturaParagraph>
-      There are many ways to build a website. If you’re considering Gatsby, you
+      There are many ways to build a website. If you're considering Gatsby, you
       may also be looking at some alternatives:
     </FuturaParagraph>
     <ul css={{ fontFamily: options.headerFontFamily.join(`,`) }}>
@@ -150,15 +127,15 @@ const FeaturesHeader = () => (
         <a href="http://jekyllrb.com/">Jekyll</a> let you put text or markdown
         in a specific directory such as <code>pages/</code> in a
         version-controlled codebase. They then build a specific kind of site,
-        usually a blog, as HTML files from the content you’ve added. These files
+        usually a blog, as HTML files from the content you've added. These files
         can be cached and served from a CDN.
       </li>
       <li>
         <b>Content Management Systems</b> (CMSs) like
         {` `}
-        <a href="http://wordpress.org/">WordPress</a> give you an online text
+        <a href="http://wordpress.org/">Wordpress</a> give you an online text
         editor to create content. You customize the look and feel through
-        choosing themes and plugins, or writing custom PHP or JavaScript code.
+        choosing themes and plugins, or writing custom PHP or Javascript code.
         Content is saved in a database, which is retrieved and sent to users
         when they visit the website. Depending on your requirements you can
         self-host your website, or use an official hosting provider.
@@ -168,12 +145,12 @@ const FeaturesHeader = () => (
         {` `}
         <a href="http://squarespace.com/">Squarespace</a> are a type of hosted
         closed-source CMS. They focus on making it fast to build a website;
-        however, they don’t allow self-hosting or enable you to export your
+        however, they don't allow self-hosting or enable you to export your
         website and customize it.
       </li>
     </ul>
     <FuturaParagraph>
-      The chart below details Gatsby’s capabilities in comparison with a
+      The chart below details Gatsby's capabilities in comparison with a
       representative from each category. Click on any row to see a more detailed
       explanation on that feature and our rating for each system.
     </FuturaParagraph>
@@ -181,7 +158,7 @@ const FeaturesHeader = () => (
       Legend
     </h6>
     <LegendTable />
-  </section>
+  </div>
 )
 
 const getFeaturesData = function(data) {
@@ -235,14 +212,12 @@ class FeaturesPage extends Component {
         enableScrollSync={true}
       >
         <Container>
-          <main id={`reach-skip-nav`}>
-            <FeaturesHeader />
-            <EvaluationTable
-              sections={sections}
-              sectionHeaders={sectionHeaders}
-            />
-            <FeaturesFooter />
-          </main>
+          <FeaturesHeader />
+          <EvaluationTable
+            sections={sections}
+            sectionHeaders={sectionHeaders}
+          />
+          <FeaturesFooter />
         </Container>
       </Layout>
     )
@@ -260,7 +235,7 @@ export const pageQuery = graphql`
           Subcategory
           Feature
           Gatsby
-          WordPress
+          Wordpress
           Squarespace
           Jekyll
           Description

@@ -21,15 +21,8 @@ exports.onPreBootstrap = async ({ store }) => {
   await apiRunnerNode(`onCreateBabelConfig`, {
     stage: `build-html`,
   })
-
-  const babelState = JSON.stringify(
-    {
-      ...store.getState().babelrc,
-      browserslist,
-    },
-    null,
-    2
-  )
-
+  const babelrcState = store.getState().babelrc
+  babelrcState.browserslist = browserslist
+  const babelState = JSON.stringify(babelrcState.stages, null, 4)
   await fs.writeFile(directoryPath(`.cache/babelState.json`), babelState)
 }
