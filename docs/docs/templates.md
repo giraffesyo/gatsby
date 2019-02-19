@@ -156,6 +156,7 @@ You can copy and paste the markdown text below and fill it in with your own info
 ```markdown
 ---
 title: Testing
+overview: true
 ---
 
 ## title: Testing
@@ -172,9 +173,7 @@ Assume the reader has basic programming knowledge like the command line, code ed
 
 ## Guides in this section
 
-- Link to guide 1
-- Link to guide 2
-- Link to guide 3
+[[guidelist]]
 
 ## Other resources
 
@@ -215,7 +214,7 @@ Topics should be chosen based on these priorities:
 
 ## Length of a tutorial
 
-If a tutorial is longer than 3 8.5x11” pages or has more than about 5 headers and you’re finding yourself creating a Table of Contents at the top, the it probably will be easier to read and easier for readers to complete if you turn into a multi-page tutorial, like the [main Gatsby tutorial](https://www.gatsbyjs.org/tutorial/).
+If a tutorial is longer than 3 8.5x11” pages or has more than about 5 headers and you’re finding yourself creating a Table of Contents at the top, it will probably be easier to read and easier for readers to complete if you turn it into a multi-page tutorial, like the [main Gatsby tutorial](https://www.gatsbyjs.org/tutorial/).
 
 If you have a tutorial that falls into this category, it is likely a big enough project that you’ll benefit from the feedback process provided by creating an [RFC (Request for Comments) document](https://github.com/gatsbyjs/rfcs).
 
